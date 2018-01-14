@@ -1,0 +1,105 @@
+# Module: __{{name}}__
+
+![category:{{category}}](images/badges/category-{{category}}.png)
+
+{{description}}
+
+[Source file]({{relativepath}})
+
+{{#if examples}}
+## Examples
+{{#each examples}}
+```javascript
+{{{this}}}
+```
+{{/each}}
+{{/if}}
+
+
+{{#if functions}}
+
+## Functions
+  {{#eachwhen functions access="public,private"}}
+
+### `{{name}}({{#join params on="name"}}{{/join}}){{#if returns}} ► {{{returns.[0].type.names.[0]}}}{{/if}}`
+
+![modifier: {{access}}](images/badges/modifier-{{access}}.png)
+{{#if static}} ![modifier: static](images/badges/modifier-static.png){{/if}}
+
+
+*{{description}}*
+
+    {{#if hasParameters}}
+Parameters | Type | Description
+--- | --- | ---
+      {{#each params}}
+__{{name}}__ | `{{{type.names.[0]}}}` | *{{description}}*
+      {{/each}}
+    {{/if}}
+    {{#if returns}}
+      {{#each returns}}
+![return](images/badges/return.png) | {{#link type.names.[0]}}{{/link}} | *{{description}}*
+      {{/each}}
+    {{/if}}
+
+    {{#if examples}}
+#### Examples
+      {{#each examples}}
+```javascript
+{{{this}}}
+```
+      {{/each}}
+    {{/if}}
+
+---
+
+  {{/eachwhen}}
+{{/if}}{{!-- functions --}}
+
+{{#if constants}}
+## Constants
+
+      {{#eachwhen constants access="public,private"}}
+### `{{name}}`
+
+*{{description}}*
+
+#### Value
+
+```javascript
+{{{valuecode}}}
+```
+    {{#if hasParameters}}
+Parameters | Type | Description
+--- | --- | ---
+      {{#each params}}
+__{{name}}__ | {{#link type.names.[0]}}{{/link}} | *{{description}}*
+      {{/each}}
+    {{/if}}
+    {{#if returns}}
+      {{#each returns}}
+![return](images/badges/return.png) | {{#link type.names.[0]}}{{/link}} | *{{description}}*
+      {{/each}}
+    {{/if}}
+
+    {{#if examples}}
+#### Examples
+      {{#each examples}}
+```javascript
+{{{this}}}
+```
+      {{/each}}
+    {{/if}}
+
+---
+      {{/eachwhen}}
+{{/if}}{{!-- constants --}}
+
+    {{#if see}}
+## Relative links
+      {{#each see}}
+      
+* {{#link this}}{{/link}}
+
+      {{/each}}
+    {{/if}}

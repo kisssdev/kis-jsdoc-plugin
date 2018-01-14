@@ -1,0 +1,98 @@
+# Class: __{{name}}__
+
+![category:{{category}}](images/badges/category-{{category}}.png){{#if virtual}} ![modifier: abstract](images/badges/modifier-abstract.png){{/if}}
+
+{{classdesc}}
+
+{{#if augments}}
+_Extends:_ {{#join augments}}{{/join}}
+{{/if}}
+
+{{#if screenshot}}![screenshot](images/screenshots/{{screenshot}}){{/if}}
+
+[Source file]({{relativepath}})
+
+{{#if examples}}
+## Examples
+{{#each examples}}
+```javascript
+{{{this}}}
+```
+{{/each}}
+{{/if}}
+
+{{#if description}}
+## Constructor
+
+{{description}}
+{{#if inject}}__Note: parameters are automatically instanciated and injected.__{{/if}}
+
+```javascript
+new {{name}}({{#join params on="name"}}{{/join}})
+```
+
+{{#if params}}
+Parameters | Type | Description
+--- | --- | ---
+  {{#each params}}
+__{{name}}__ | {{#link type.names.[0]}}{{/link}} | *{{description}}*
+  {{/each}}
+{{/if}}{{!-- params --}}
+{{/if}}{{!-- description --}}
+{{#if functions}}
+
+## Methods
+  {{#each functions}}
+
+### `{{name}}({{#join params on="name"}}{{/join}}){{#if returns}} ► {{{returns.[0].type.names.[0]}}}{{/if}}`
+
+![modifier: {{access}}](images/badges/modifier-{{access}}.png)
+{{#if static}} ![modifier: static](images/badges/modifier-static.png){{/if}}
+
+{{description}}
+
+    {{#if hasParameters}}
+Parameters | Type | Description
+--- | --- | ---
+      {{#each params}}
+__{{name}}__ | {{#link type.names.[0]}}{{/link}} | *{{description}}*
+      {{/each}}
+    {{/if}}
+    {{#if returns}}
+      {{#each returns}}
+![return](images/badges/return.png) | {{#link type.names.[0]}}{{/link}} | *{{description}}*
+      {{/each}}
+    {{/if}}
+
+    {{#if examples}}
+#### Examples
+      {{#each examples}}
+```javascript
+{{{this}}}
+```
+      {{/each}}
+    {{/if}}
+
+---
+
+  {{/each}}
+{{/if}}{{!-- functions --}}
+
+{{#if members}}
+## Members
+
+Name | Type | Description
+--- | --- | ---
+      {{#each members}}
+__{{name}}__ | {{#link type.names.[0]}}{{/link}} | *{{description}}*
+      {{/each}}
+{{/if}}{{!-- properties --}}
+
+    {{#if see}}
+## Relative links
+      {{#each see}}
+
+* {{#link this}}{{/link}}
+
+      {{/each}}
+    {{/if}}
