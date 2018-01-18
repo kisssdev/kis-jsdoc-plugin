@@ -1,0 +1,11 @@
+{
+  "js": {
+    "indent_size": 2,
+    "jslint_happy": true,
+    "max_preserve_newlines": 2,
+    "brace_style": "collapse,preserve-inline",
+    "end_with_newline": true,
+    "wrap_line_length": 120
+  }
+
+}

@@ -1,5 +1,6 @@
 /**
- * Defines a jsdoc template that creates a code tree based on the jsdoc doclets and calls the docgenerator.
+ * Defines a jsdoc template that creates a code tree based on the jsdoc doclets
+ * and calls the docgenerator.
  * @module
  */
 
@@ -19,7 +20,7 @@ const configuration = {
   function: { childrenCollection: 'functions', recurse: false },
   member: { childrenCollection: 'members', recurse: false },
   event: { childrenCollection: 'events', recurse: false },
-  constant: { childrenCollection: 'constants', recurse: false }
+  constant: { childrenCollection: 'constants', recurse: false },
 };
 
 /**
@@ -30,13 +31,15 @@ const configuration = {
  */
 function attachToParent(doclet, parentNode, doclets) {
   // identify the process depending of the doclet kind
-  let process = configuration[doclet.kind];
+  const process = configuration[doclet.kind];
   if (!process) return; // nothing to process
   // create the parent node children collection if not present
+  /* eslint-disable no-param-reassign */
   if (!parentNode[process.childrenCollection]) parentNode[process.childrenCollection] = [];
   // add the child node to the parent node children collection
   parentNode[process.childrenCollection].push(doclet);
   // recurse the process if applicable
+  /* eslint-disable no-use-before-define */
   if (process.recurse) buildTree(doclet, doclets, doclet.longname);
 }
 
@@ -59,12 +62,16 @@ function buildTree(parentNode, doclets, parentLongname) {
  */
 exports.publish = (data, opts) => {
   // filter Taffy database to remove undocumented doclets
-  data([{ undocumented: true }, { kind: 'package' }]).remove();
+  data([{
+    undocumented: true,
+  }, {
+    kind: 'package',
+  }]).remove();
 
   // build the documentation tree
-  let rootNode = {};
+  const rootNode = {};
   buildTree(rootNode, data().get());
 
   // generate the doc
-  docGenerator.generateDoc(rootNode);
+  docGenerator.generateDoc(rootNode, opts);
 };
