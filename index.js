@@ -6,6 +6,7 @@
 const path = require('path');
 const fs = require('fs');
 const lineColumn = require('line-column');
+const env = require('jsdoc/env');
 
 const exportedClasses = [];
 
@@ -27,6 +28,13 @@ const defaultProcess = (cf, k) => d => {
 };
 
 /**
+ * The configuration of the jsdoc plugin.
+ */
+let config = {
+  docFolder: env.opts.destination
+};
+
+/**
  * Configuration used to process jsdoc doclet instance.
  * Each key of the configuration object defines a process:
  * - either explicitly with the 'process' function,
@@ -34,7 +42,7 @@ const defaultProcess = (cf, k) => d => {
  * The process is executed if there is no 'condition' function, or if the condition evaluates to true.
  * @type {Object.<{condition: function, process: function, value: function}>}
  */
-const configuration = {
+const processConfig = {
   isExportedClass: {
     condition: d => d.kind === 'class' && (
       d.meta.code.node.type.startsWith('Export') ||
@@ -46,7 +54,7 @@ const configuration = {
     value: d => d.kind === 'module' ? d.description : d.classdesc
   },
   valuecode: { // the source code of a constant
-    condition: d => d.kind === 'constant' ,
+    condition: d => d.kind === 'constant',
     value: d => {
       let sourcefile = path.join(d.meta.path, d.meta.filename);
       let source = fs.readFileSync(sourcefile, 'utf8');
@@ -61,7 +69,7 @@ const configuration = {
       if (!['module', 'class'].includes(d.kind)) return false;
       // the relative path of the screenshot file
       let filename = `${d.kind}_` + path.basename(d.meta.filename, path.extname(d.meta.filename)) + '.png';
-      let filepath = path.join(env.opts.destination, 'images/screenshots', filename);
+      let filepath = path.join(config.docFolder, 'images/screenshots', filename);
       return fs.existsSync(filepath);
     },
     value: d => `${d.kind}_` + path.basename(d.meta.filename, path.extname(d.meta.filename)) + '.png'
@@ -74,12 +82,12 @@ const configuration = {
     value: d => d.scope === 'static'
   },
   hasParameters: { // has the documented object @param or @return tags?
-    value: d => (d.params && d.params.length > 0) || (d.returns && d.returns.length > 0)
+    value: d => d.params && d.params.length > 0 || d.returns && d.returns.length > 0
   },
   relativepath: { // the relative path from the documentation to the source code
     value: d => {
       let filepath = path.join(d.meta.path, d.meta.filename); // the absolute path of the source file
-      return path.relative(env.opts.destination, filepath); // the relative path of the source file from the documentation folder
+      return path.relative(config.docFolder, filepath); // the relative path of the source file from the documentation folder
     }
   },
   type: { // a shortcut to the type of a member
@@ -87,7 +95,7 @@ const configuration = {
     value: d => d.returns[0].type
   },
   access: { // the accessibility of the documented object
-    condition: d => !(d.access),
+    condition: d => !d.access,
     value: d => {
       if (d.memberof && exportedClasses.includes(d.memberof) && d.name.charAt(0) !== '_') return 'public';
       if ((d.kind === 'constant' || d.kind === 'function') && d.meta.code.name.startsWith('exports.')) return 'public';
@@ -121,9 +129,9 @@ exports.handlers = {
    */
   newDoclet: e => {
     let doclet = e.doclet;
-    Object.keys(configuration)
-      .filter(k => configuration[k].condition === undefined || configuration[k].condition(doclet))
-      .forEach(k => (configuration[k].process || defaultProcess(configuration[k], k))(doclet));
+    Object.keys(processConfig)
+      .filter(k => processConfig[k].condition === undefined || processConfig[k].condition(doclet))
+      .forEach(k => (processConfig[k].process || defaultProcess(processConfig[k], k))(doclet));
   }
 };
 
