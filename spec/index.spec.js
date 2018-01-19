@@ -2,90 +2,68 @@ const mock = require('mock-require');
 
 mock('jsdoc/env', {
   opts: {
-    destination: 'test'
-  }
+    destination: 'test',
+  },
 });
 
 const systemUndertest = require('../index');
 
+/* eslint-disable no-undef */
 describe('KisJsdocPlugin', () => {
   describe('exports.handlers', () => {
     describe('newDoclet', () => {
-      it('creates a property "static":true when "scope":static', () => {
-        let doclet = {
+      it('creates a property "static":true when "scope":static.', () => {
+        const doclet = {
           meta: {
             path: 'path',
-            filename: 'filename'
+            filename: 'filename',
           },
-          scope: 'static'
+          scope: 'static',
         };
         systemUndertest.handlers.newDoclet({
-          doclet: doclet
+          doclet,
         });
         expect(doclet).toEqual(jasmine.objectContaining({
-          static: true
+          static: true,
         }));
       });
-    });
-    describe('newDoclet', () => {
-      it('creates a property tocDescription for module that matches description', () => {
+      it('creates a property "tocDescription" for module that matches description property.', () => {
         const expectedDescription = 'test';
-        let doclet = {
+        const doclet = {
           kind: 'module',
           description: expectedDescription,
           meta: {
             path: 'path',
-            filename: 'filename'
-          }
+            filename: 'filename',
+          },
         };
         systemUndertest.handlers.newDoclet({
-          doclet: doclet
+          doclet,
         });
         expect(doclet).toEqual(jasmine.objectContaining({
-          tocDescription: expectedDescription
+          tocDescription: expectedDescription,
         }));
       });
-    });
-    describe('newDoclet', () => {
-      it('creates a property "tocDescription" for module that matches description', () => {
+      it('creates a property "tocDescription" for class that matches classdesc property.', () => {
         const expectedDescription = 'test';
-        let doclet = {
-          kind: 'module',
-          description: expectedDescription,
-          meta: {
-            path: 'path',
-            filename: 'filename'
-          }
-        };
-        systemUndertest.handlers.newDoclet({
-          doclet: doclet
-        });
-        expect(doclet).toEqual(jasmine.objectContaining({
-          tocDescription: expectedDescription
-        }));
-      });
-    });
-    describe('newDoclet', () => {
-      it('creates a property "tocDescription" for class that matches classdesc', () => {
-        const expectedDescription = 'test';
-        let doclet = {
+        const doclet = {
           kind: 'class',
           classdesc: expectedDescription,
           meta: {
             code: {
               node: {
-                type: ''
-              }
+                type: '',
+              },
             },
             path: 'path',
-            filename: 'filename'
-          }
+            filename: 'filename',
+          },
         };
         systemUndertest.handlers.newDoclet({
-          doclet: doclet
+          doclet,
         });
         expect(doclet).toEqual(jasmine.objectContaining({
-          tocDescription: expectedDescription
+          tocDescription: expectedDescription,
         }));
       });
     });

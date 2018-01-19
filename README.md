@@ -100,7 +100,7 @@ exports.foo = x => ...;
 
 ## Automatic links to class documentation
 
-* If all you EcmaScript classes have unique names and if you use the class name as parameters of your `@param`, `@return`, `@see` tags or {@link} inline tag, a link to the corresponding class documentation will be created.
+* If all you EcmaScript classes have unique names and if you use the class name as parameters of your `@param`, `@return`, `@see` tags or {@link} inline tag, a markdown link to the corresponding class documentation will be created.
 
 ```javascript
 /**
