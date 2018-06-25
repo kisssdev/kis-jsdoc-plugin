@@ -41,7 +41,7 @@ const config = {
  * Each key of the configuration object defines a process:
  * - either explicitly with the 'process' function,
  * - either implictly by applying a value to the corresponding key property of the doclet instance. In such case, the 'value' function is used.
- * The process is executed if there is no 'condition' function, or if the condition evaluates to true.
+ * In both cases, the process is executed if there is no 'condition' function, or if the 'condition' function evaluates to true.
  * @type {Object.<{condition: function, process: function, value: function}>}
  */
 const processConfig = {

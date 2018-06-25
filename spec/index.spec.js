@@ -1,3 +1,4 @@
+/* global describe, it, expect, jasmine */
 const mock = require('mock-require');
 
 mock('jsdoc/env', {
@@ -8,7 +9,7 @@ mock('jsdoc/env', {
 
 const systemUndertest = require('../index');
 
-/* eslint-disable no-undef */
+
 describe('KisJsdocPlugin', () => {
   describe('exports.handlers', () => {
     describe('newDoclet', () => {
