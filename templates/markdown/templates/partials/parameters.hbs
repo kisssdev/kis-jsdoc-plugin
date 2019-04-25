@@ -1,0 +1,13 @@
+
+{{#if hasParameters}}
+Parameters | Type | Description
+--- | --- | ---
+{{#each params}}
+__{{name}}__ | {{#link type.names.[0]}}{{/link}} | *{{description}}*
+{{/each}}
+{{/if}}
+{{#if returns}}
+{{#each returns}}
+__*return*__ | {{#link type.names.[0]}}{{/link}} | *{{description}}*
+{{/each}}
+{{/if}}

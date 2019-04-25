@@ -1,10 +1,10 @@
-# Project's documentation
+# Code documentation
 
 ## Table of contents
 
 {{#each this}}
-* ![category:{{name}}](images/badges/category-{{name}}.png)
+* ![category:{{name}}](https://img.shields.io/badge/category-{{name}}-{{color}}.svg?style=flat-square)
     {{#each entries}}
-  * [{{name}}]({{docfilename}}) - _{{tocDescription}}_
+  * {{#link name}}{{/link}} - _{{tocDescription}}_
     {{/each}}
 {{/each}}

@@ -1,0 +1,16 @@
+{{#if functions}}
+
+## {{title}}
+{{#each functions}}
+
+### `{{name}}({{#join params on="name"}}{{/join}}){{#if returns}} ► {{{returns.[0].type.names.[0]}}}{{/if}}`
+
+![modifier: {{access}}](images/badges/modifier-{{access}}.svg)
+{{#if static}} ![modifier: static](images/badges/modifier-static.svg){{/if}}
+{{description}}
+{{> parameters}}
+{{> examples level='####' }}
+
+---
+{{/each}}
+{{/if}}

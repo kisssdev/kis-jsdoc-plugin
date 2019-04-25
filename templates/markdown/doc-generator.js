@@ -16,8 +16,11 @@ const config = {
   docFolder: env.opts.destination,
   rootFolder: env.opts.template,
   encoding: env.opts.encoding,
-  tocfilename: (env.conf.templates && env.conf.templates.markdown &&
-    env.conf.templates.markdown.tocfilename) || 'toc.md',
+  tocfilename:
+    (env.conf.templates && env.conf.templates.markdown && env.conf.templates.markdown.tocfilename) || 'toc.md',
+  tocOrder: (env.conf.templates && env.conf.templates.markdown && env.conf.templates.markdown.tocOrder) || {},
+  externallinks: (env.conf.templates && env.conf.templates.markdown && env.conf.templates.markdown.externallinks) || {},
+  badgecolors: (env.conf.templates && env.conf.templates.markdown && env.conf.templates.markdown.badgecolors) || {},
 };
 
 /**
@@ -27,14 +30,15 @@ const config = {
  * @param {function} [valueGenerator=(item, index)=>item] - The function used to set the value of the object added to the dictionary.
  * @return {Object} The object acting as a dictionary.
  */
-const toDictionary = (arr, keyGenerator, valueGenerator = item => item) => arr.reduce((acc, item, index) => {
-  acc[keyGenerator(item, index)] = valueGenerator(item, index);
-  return acc;
-}, {});
+const toDictionary = (arr, keyGenerator, valueGenerator = item => item) =>
+  arr.reduce((acc, item, index) => {
+    acc[keyGenerator(item, index)] = valueGenerator(item, index);
+    return acc;
+  }, {});
 
 /**
  * Converts an array of object to an object containing arrays.
- * The value produced by the specified keyGenerator is used to define the properties of the resulting object.
+ * The value produced by the specified keySelector is used to define the properties of the resulting object.
  * @param {Array.<Object>} arr - The array of objects to convert to dictionary.
  * @param {function} keySelector - The function used to define the key.
  * @param {function} [valueSelector=(item, index)=>item] - The function used to define the value.
@@ -46,12 +50,13 @@ const toDictionary = (arr, keyGenerator, valueGenerator = item => item) => arr.r
  * let res = keyBy([{n:'a', v:1}, {n:'b', v:2}, {n:'a', v:3}], o => o.n);
  * // res is {a: [{n:'a', v:1}, {n:'a', v:3}], b: [{n:'b', v:2}] }
  */
-const keyBy = (arr, keySelector, valueSelector = item => item) => arr.reduce((acc, item) => {
-  const valuesArray = acc[keySelector(item)] || [];
-  valuesArray.push(valueSelector(item));
-  acc[keySelector(item)] = valuesArray;
-  return acc;
-}, {});
+const keyBy = (arr, keySelector, valueSelector = item => item) =>
+  arr.reduce((acc, item) => {
+    const valuesArray = acc[keySelector(item)] || [];
+    valuesArray.push(valueSelector(item));
+    acc[keySelector(item)] = valuesArray;
+    return acc;
+  }, {});
 
 /**
  * Transforms {\@link MyClass} or {\@link url|A text} inline tags within the specified jsdoc doclet
@@ -60,16 +65,45 @@ const keyBy = (arr, keySelector, valueSelector = item => item) => arr.reduce((ac
  * @param {Object.<string>} typesIndex - The types index - associating a type with its documentation file.
  */
 function generateLinks(doclet, typesIndex) {
-  const regexp = /\{@link\s+([^|\s]+)(|[^{]+)?\}/ig; // capture only {@link namepathOrURL} or {@link namepathOrURL|link text}
-  const transformLinks = s => (regexp.test(s) ?
-    s.replace(regexp, (str, p1, p2) => {
-      const label = !p2 ? p1 : p2.substring(1);
-      const link = typesIndex[p1] || p1;
-      return `[${label}](${link})`;
-    }) :
-    s);
+  const regexp = /\{@link\s+([^|\s]+)(|[^{]+)?\}/gi; // capture only {@link namepathOrURL} or {@link namepathOrURL|link text}
+  const transformLinks = s =>
+    (regexp.test(s)
+      ? s.replace(regexp, (str, p1, p2) => {
+        const label = !p2 ? p1 : p2.substring(1);
+        const link = typesIndex[p1] || p1;
+        return `[${label}](${link})`;
+      })
+      : s);
   /* eslint-disable no-param-reassign */
-  ['classdesc', 'description', 'tocDescription'].forEach((s) => { doclet[s] = transformLinks(doclet[s]); });
+  ['classdesc', 'description', 'tocDescription'].forEach((s) => {
+    doclet[s] = transformLinks(doclet[s]);
+  });
+}
+
+/**
+ * Compiles the handlebars templates and defines a templates index in the given folder.
+ * If registerAsPartial is true, templates are only precompiled and no index is returned.
+ * @return {Object.<string>} The templates index - associating the name of the template with its handlebar compiled template.
+ */
+function compileTemplatesInFolder(folder, registerAsPartial = false) {
+  const templates = {};
+  fs.readdirSync(folder, { encoding: config.encoding, withFileTypes: true })
+    .filter(d => !d.isDirectory())
+    .forEach((f) => {
+      try {
+        const templateName = path.basename(f.name, path.extname(f.name));
+        const templateSource = fs.readFileSync(path.join(folder, f.name), config.encoding);
+        if (registerAsPartial) {
+          // let partial = Handlebars.precompile(templateSource);
+          Handlebars.registerPartial(templateName, templateSource);
+        } else {
+          templates[templateName] = Handlebars.compile(templateSource);
+        }
+      } catch (err) {
+        logger.error(`Unable to compile the template file ${f.name}: ${err}`);
+      }
+    });
+  return templates;
 }
 
 /**
@@ -77,19 +111,11 @@ function generateLinks(doclet, typesIndex) {
  * @return {Object.<string>} The templates index - associating the name of the template with its handlebar compiled template.
  */
 function compileTemplates() {
-  const templates = {};
+  let templates = {};
   const templatesFolder = path.join(config.rootFolder, 'templates');
   try {
-    fs.readdirSync(templatesFolder, config.encoding).forEach((filename) => {
-      try {
-        const templatePath = path.join(templatesFolder, filename);
-        const templateName = path.basename(filename, path.extname(filename));
-        const templateSource = fs.readFileSync(templatePath, config.encoding);
-        templates[templateName] = Handlebars.compile(templateSource);
-      } catch (err) {
-        logger.error(`Unable to compile the template file ${filename}: ${err}`);
-      }
-    });
+    compileTemplatesInFolder(path.join(templatesFolder, 'partials'), true);
+    templates = compileTemplatesInFolder(templatesFolder);
   } catch (e) {
     logger.error(`Unable to enumerate and compile template files: ${e}`);
   }
@@ -102,12 +128,8 @@ function compileTemplates() {
  * @return {string} The documentation file name.
  */
 function defineDocfilename(doclet) {
-  let basename = path.basename(doclet.meta.filename, path.extname(doclet.meta.filename));
-  if (basename === 'index') {
-    const lastFolder = doclet.meta.path.split(path.sep).slice(-1)[0];
-    basename = `${lastFolder}_${basename}`;
-  }
-  return `${doclet.kind}_${basename}.md`;
+  const uniquePath = path.relative(env.pwd, doclet.meta.path).replace(new RegExp(`\\${path.sep}`, 'g'), '-');
+  return `${uniquePath}_${path.basename(doclet.meta.filename, path.extname(doclet.meta.filename))}.md`;
 }
 
 /**
@@ -123,10 +145,10 @@ function generateDocfile(model, template, docfilename) {
   }
   try {
     const result = template(model);
-    const docpath = path.join(config.docFolder, docfilename);
-    fs.ensureDirSync(config.docFolder);
-    fs.writeFile(docpath, result, config.encoding, (err) => {
-      if (err) logger.error(`Unable to save ${docfilename}: ${err.message}`);
+    const docfilepath = path.join(config.docFolder, docfilename);
+    fs.ensureFileSync(docfilepath);
+    fs.writeFile(docfilepath, result, config.encoding, (err) => {
+      if (err) logger.error(`Unable to save ${docfilepath}: ${err.message}`);
     });
   } catch (e) {
     logger.error(`Unable to generate ${docfilename}: ${e}`);
@@ -141,9 +163,7 @@ function generateDocfile(model, template, docfilename) {
  */
 function generateDoc(doclet, template, typesIndex) {
   generateLinks(doclet, typesIndex);
-  /* eslint-disable no-param-reassign */
-  doclet.docfilename = defineDocfilename(doclet);
-  generateDocfile(doclet, template, doclet.docfilename);
+  generateDocfile(doclet, template, defineDocfilename(doclet));
 }
 
 /**
@@ -152,9 +172,17 @@ function generateDoc(doclet, template, typesIndex) {
  * @param {Template} template - The handlebars template.
  */
 function generateToc(rootNode, template) {
-  if (!rootNode.classes && !rootNode.modules) return;
-  const docByCategory = keyBy([...rootNode.classes || [], ...rootNode.modules || []], d => d.category);
-  const toc = Object.keys(docByCategory).map(cat => ({ name: cat, entries: docByCategory[cat] }));
+  if (!rootNode.modules) return;
+  const docByCategory = keyBy([...(rootNode.modules || [])], d => d.category);
+  const colorByCategory = config.badgecolors;
+  const tocSorter = (c1, c2) => config.tocOrder[c1] - config.tocOrder[c2];
+  const toc = Object.keys(docByCategory)
+    .sort(tocSorter)
+    .map(cat => ({
+      name: cat,
+      entries: docByCategory[cat],
+      color: colorByCategory[cat] || 'blue',
+    }));
   generateDocfile(toc, template, config.tocfilename);
 }
 
@@ -177,21 +205,14 @@ function initHandlebars(typesIndex) {
   Handlebars.registerHelper('join', (context, options) => {
     const prop = options.hash.on;
     const target = p => (prop ? p[prop] : p);
-    return context ? context.map(p => target(p)).filter(p => !p.includes('.')).join(', ') : '';
+    return context
+      ? context
+        .map(p => target(p))
+        .filter(p => !p.includes('.'))
+        .join(', ')
+      : '';
   });
-  Handlebars.registerHelper('eachwhen', (context, options) => {
-    // each options.hash is a property 'p' of the object 'o' on which we set a predicate to filter a value or a list of values (separated by ',')
-    const predicates = Object
-      .keys(options.hash)
-      .map(p => o => (options.hash[p] ? (options.hash[p].split(',') || []).includes(o[p]) : true));
-    // cumulate predicates as 'and'
-    const predicate = predicates.reduce((prev, curr) => o => prev(o) && curr(o), () => true);
-    return context.filter(predicate).map(o => options.fn(o)).reduce((prev, curr) => prev + curr, '');
-  });
-  Handlebars.registerHelper(
-    'link',
-    item => (typesIndex[item] ? `[${item}](${typesIndex[item]})` : `\`${item}\``)
-  );
+  Handlebars.registerHelper('link', item => (typesIndex[item] ? `[${item}](${typesIndex[item]})` : `\`${item}\``));
   return compileTemplates();
 }
 
@@ -201,12 +222,14 @@ function initHandlebars(typesIndex) {
  */
 exports.generateDoc = (rootNode) => {
   // generate an index of the class type <-> doc file
-  const typesIndex = toDictionary(rootNode.classes || [], d => d.name, d => defineDocfilename(d));
+  const typesIndex = toDictionary(rootNode.modules || [], d => d.name, d => defineDocfilename(d));
+  Object.entries(config.externallinks).forEach(([key, value]) => {
+    typesIndex[key] = value;
+  });
   // create handlebars helpers and compile templates
   const templates = initHandlebars(typesIndex);
-  // generate doc file for classes and modules
-  if (rootNode.classes) rootNode.classes.forEach(d => generateDoc(d, templates[d.kind], typesIndex));
-  if (rootNode.modules) rootNode.modules.forEach(d => generateDoc(d, templates[d.kind], typesIndex));
+  // generate doc file for each modules
+  if (rootNode.modules) rootNode.modules.forEach(d => generateDoc(d, templates.module, typesIndex));
   // generate the TOC
   generateToc(rootNode, templates.toc);
   // copy the resources

@@ -1,0 +1,17 @@
+{{#if classes}}
+
+## Constructors
+{{#if inject}}
+
+__Note: parameters are automatically instanciated and injected.__
+{{/if}}
+{{#each classes}}
+
+### `{{name}}({{#join params on="name"}}{{/join}})`
+
+{{description}}
+{{>parameters}}
+
+---
+{{/each}}
+{{/if}}

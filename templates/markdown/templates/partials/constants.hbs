@@ -1,0 +1,23 @@
+{{#if constants}}
+
+## Constants
+{{#each constants}}
+
+### `{{name}}`
+
+![modifier: {{access}}](images/badges/modifier-{{access}}.svg)
+{{#if static}} ![modifier: static](images/badges/modifier-static.svg){{/if}}
+
+{{description}}
+{{> parameters }}
+
+#### Value
+
+```javascript
+{{{valuecode}}}
+```
+{{> examples level='####' }}
+
+---
+{{/each}}
+{{/if}}

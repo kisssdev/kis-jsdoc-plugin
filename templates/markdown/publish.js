@@ -62,11 +62,7 @@ function buildTree(parentNode, doclets, parentLongname) {
  */
 exports.publish = (data, opts) => {
   // filter Taffy database to remove undocumented doclets
-  data([{
-    undocumented: true,
-  }, {
-    kind: 'package',
-  }]).remove();
+  data([{ undocumented: true }, { included: false }, { kind: 'package' }]).remove();
 
   // build the documentation tree
   const rootNode = {};

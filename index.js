@@ -12,11 +12,34 @@ const env = require('jsdoc/env');
 const exportedClasses = [];
 
 /**
+ * Get the absolute file path corresponding to the specified doclet.
+ * @param {Doclet} d - the specified doclet
+ * @returns {string} the absolute file path
+ */
+const getFilePath = d => path.join(d.meta.path, d.meta.filename);
+
+/**
  * Converts a Kebab cased string in a Pascal cased string.
  * @param {string} s - The string in Kebab casing to convert in Pascal casing.
  * @return {string} - The Pascal cased string.
  */
-const hyphenToPascal = (s) => s.replace(/(-|^)([a-z])/gi, (match, delimiter, hyphenated) => hyphenated.toUpperCase());
+const hyphenToPascal = s => s.replace(/(-|^)([a-z])/gi, (match, delimiter, hyphenated) => hyphenated.toUpperCase());
+
+/**
+ * Get the module name corresponding to the given filename and path.
+ * In case of index.js the folder name is used.
+ * @param {string} filename - the given filename
+ * @param {string} folderPath - the given folder path containing the file
+ * @returns {string} the module name
+ */
+const getModuleName = (filename, folderPath) => {
+  const shortname = path.basename(filename, path.extname(filename));
+  if (shortname !== 'index') {
+    return hyphenToPascal(shortname);
+  }
+  const folder = folderPath.split(path.sep).slice(-1)[0];
+  return hyphenToPascal(folder);
+};
 
 /**
  * Defines the default process on doclet: applying the 'value' function defined on the configuration object to the specified key/property of the doclet instance.
@@ -33,7 +56,12 @@ const defaultProcess = (cf, k) => (d) => {
  * The configuration of the jsdoc plugin.
  */
 const config = {
-  docFolder: env.opts.destination
+  docFolder: env.opts.destination,
+  includes: (env.opts.includes || 'public,protected,private')
+    .toLowerCase()
+    .replace(' ', '')
+    .split(','),
+  badgecolors: (env.conf.templates && env.conf.templates.markdown && env.conf.templates.markdown.badgecolors) || {},
 };
 
 /**
@@ -46,21 +74,22 @@ const config = {
  */
 const processConfig = {
   isExportedClass: {
-    condition: (d) =>
+    // new 'isExportedClass' property that indicates if the class is exported
+    condition: d =>
       d.kind === 'class' &&
-      (d.meta.code.name.startsWith('export') || (d.tags && d.tags.some((t) => t.title === 'export'))),
-    process: (d) => exportedClasses.push(d.name)
+      (d.meta.code.name.startsWith('export') || (d.tags && d.tags.some(t => t.title === 'export'))),
+    process: d => exportedClasses.push(d.name),
   },
   tocDescription: {
-    // the description of a class or a module that appears in the toc
-    condition: (d) => ['module', 'class'].includes(d.kind),
-    value: (d) => (d.kind === 'module' ? d.description : d.classdesc)
+    // new 'tocDescription' property that represents the description of a module that appears in the toc
+    condition: d => d.kind === 'module' && !d.tocDescription,
+    value: d => d.description,
   },
   valuecode: {
-    // the source code of a constant
-    condition: (d) => d.kind === 'constant',
+    // new 'valuecode' property that represents the source code of a constant
+    condition: d => d.kind === 'constant',
     value: (d) => {
-      const sourcefile = path.join(d.meta.path, d.meta.filename);
+      const sourcefile = getFilePath(d);
       const source = fs.readFileSync(sourcefile, 'utf8');
       const indexedSource = lineColumn(source);
       const { loc } = d.meta.code.node;
@@ -68,11 +97,11 @@ const processConfig = {
         indexedSource.toIndex(loc.start.line, loc.start.column + 1),
         indexedSource.toIndex(loc.end.line, loc.end.column + 1)
       );
-      return code.slice(code.indexOf(' =') + 3, -1);
-    }
+      return code.indexOf(' =') === -1 ? code : code.slice(code.indexOf(' =') + 3, -1);
+    },
   },
   screenshot: {
-    // the path to a screenshot
+    // new 'screenshot' property that indicates if the documented has a related snapshot image?
     condition: (d) => {
       if (!['module', 'class'].includes(d.kind)) return false;
       // the relative path of the screenshot file
@@ -80,84 +109,139 @@ const processConfig = {
       const filepath = path.join(config.docFolder, 'images/screenshots', filename);
       return fs.existsSync(filepath);
     },
-    value: (d) => `${d.kind}_${path.basename(d.meta.filename, path.extname(d.meta.filename))}.png`
+    value: d => `${d.kind}_${path.basename(d.meta.filename, path.extname(d.meta.filename))}.png`,
   },
   category: {
-    // the category
-    condition: (d) => !d.category && ['module', 'class'].includes(d.kind),
-    value: () => 'other'
+    // modify the 'category' property: add a default value ('other') if none found
+    condition: d => !d.category && ['module', 'class'].includes(d.kind),
+    value: () => 'other',
+  },
+  categorycolor: {
+    // new 'categorycolor' property
+    value: d => config.badgecolors[d.category],
   },
   static: {
-    // is the documented object static?
-    value: (d) => d.scope === 'static'
+    // new 'relativepath' property that indicates if the documented object is static?
+    value: d => d.scope === 'static',
   },
   hasParameters: {
-    // has the documented object @param or @return tags?
-    value: (d) => (d.params && d.params.length > 0) || (d.returns && d.returns.length > 0)
+    // new 'hasParameters' property that indicates if the documented object has @param or @return tags?
+    value: d => (d.params && d.params.length > 0) || (d.returns && d.returns.length > 0),
   },
   relativepath: {
-    // the relative path from the documentation to the source code
+    // new 'relativepath' property that indicates the relative path from the documentation to the source code
     value: (d) => {
-      const filepath = path.join(d.meta.path, d.meta.filename); // the absolute path of the source file
+      const filepath = getFilePath(d); // the absolute path of the source file
       return path.relative(config.docFolder, filepath); // the relative path of the source file from the documentation folder
-    }
+    },
   },
   type: {
-    // a shortcut to the type of a member
-    condition: (d) => d.kind === 'member' && d.returns && d.returns.length > 0,
-    value: (d) => d.returns[0].type
+    // new 'type' property that indicates the type of a member
+    condition: d => d.kind === 'member' && d.returns && d.returns.length > 0,
+    value: d => d.returns[0].type,
+  },
+  memberof: {
+    // modify the 'memberof' property: try to add the correct value if none found
+    condition: d => d.kind !== 'module' && !d.memberof && d.longname.startsWith('module:'),
+    value: d => d.longname // deal with the export default...
+    ,
   },
   access: {
-    // the accessibility of the documented object
-    condition: (d) => !d.access,
+    // modify the 'access' property: add a default value ('private') if none found
+    condition: d => !d.access,
     value: (d) => {
       if (d.memberof && exportedClasses.includes(d.memberof) && d.name.charAt(0) !== '_') return 'public';
       if ((d.kind === 'constant' || d.kind === 'function') && d.meta.code.name.startsWith('exports.')) return 'public';
       return 'private';
-    }
+    },
+  },
+  included: {
+    // new 'included' property that indicates if the comment is to be included in the doc
+    value: d => ['module', 'class'].includes(d.kind) || config.includes.includes(d.access),
   },
   name: {
-    // the name of a module to deal with index.js within a folder
-    condition: (d) => d.kind === 'module',
-    value: (d) => {
-      const filename = path.basename(d.meta.filename, path.extname(d.meta.filename));
-      if (filename !== 'index') {
-        return hyphenToPascal(filename);
-      }
-      const folder = d.meta.path.split(path.sep).slice(-1)[0];
-      return hyphenToPascal(folder);
-    }
+    // modify the 'name' property of a module to deal with index.js within a folder
+    condition: d => d.kind === 'module',
+    value: d => getModuleName(d.meta.filename, d.meta.path),
   },
   inject: {
-    // is the documented object decorated with the @inject decorator?
-    condition: (d) => d.kind === 'class' && d.meta.code.node.decorators && d.meta.code.node.decorators.length > 0,
-    value: (d) => {
-      return d.meta.code.node.decorators
-        .map((dec) => {
-          let decoratorName = '';
-          if (dec.expression.type === 'Identifier') decoratorName = dec.expression.name;
-          if (dec.expression.type === 'CallExpression') decoratorName = dec.expression.callee.name;
-          return decoratorName;
-        })
-        .includes('inject');
-    }
-  }
+    // new 'inject' property that indicates if the documented object is decorated with the @inject decorator?
+    condition: d => d.kind === 'class' && d.meta.code.node.decorators && d.meta.code.node.decorators.length > 0,
+    value: d => d.meta.code.node.decorators
+      .map((dec) => {
+        let decoratorName = '';
+        if (dec.expression.type === 'Identifier') decoratorName = dec.expression.name;
+        if (dec.expression.type === 'CallExpression') decoratorName = dec.expression.callee.name;
+        return decoratorName;
+      })
+      .includes('inject'),
+  },
 };
+
+/**
+ * Reprocess the specified doclet to add or modify properties based on the processConfig object.
+ * @param {Doclet} doclet - the specified doclet
+ */
+const reprocessDoclet = doclet =>
+  Object.keys(processConfig)
+    .filter(k => processConfig[k].condition === undefined || processConfig[k].condition(doclet))
+    .forEach(k => (processConfig[k].process || defaultProcess(processConfig[k], k))(doclet));
 
 /**
  * This plugin completes the jsdoc doclet with new properties when the doclet is created.
  */
 exports.handlers = {
+  parseComplete: (e) => {
+    const { doclets } = e;
+    // 1: all js files with comments
+    const documentedFiles = new Set(doclets.filter(d => !d.undocumented).map(d => getFilePath(d)));
+    // 2: js files documented as @module
+    const documentedAsModuleFiles = new Set(doclets
+      .filter(d => d.kind === 'module' && !d.undocumented).map(d => getFilePath(d)));
+    // define the (1-2) remaining files that will now be documented through new 'parent' module doclets
+    const toDocumentAsModuleFiles = [...documentedFiles].filter(x => !documentedAsModuleFiles.has(x));
+    // retrieve documented global class and functions and configure memberof so that they will be attached
+    // to their new 'parent' module doclets
+    const classDoclets = doclets.filter(d => d.kind === 'class' && d.scope === 'global' && !d.undocumented);
+    classDoclets.forEach((d) => {
+      d.memberof = `module:${d.name}`;
+    });
+    const functionsDoclets = doclets.filter(d => d.kind === 'function' && d.scope === 'global' && !d.undocumented);
+    functionsDoclets.forEach((d) => {
+      const moduleName = getModuleName(d.meta.filename, d.meta.path);
+      d.memberof = `module:${moduleName}`;
+    });
+    // class dictionary to copy some class properties to the new 'parent' module doclets
+    const documentedAsClassFiles = new Map(classDoclets.map(d => [getFilePath(d), d]));
+    // the new parent module doclets to be created
+    const modules = toDocumentAsModuleFiles.map((f) => {
+      const classDoclet = documentedAsClassFiles.has(f) ? documentedAsClassFiles.get(f) : {};
+      const moduleName = getModuleName(path.basename(f), path.dirname(f));
+      const doclet = {
+        tocDescription: classDoclet.classdesc || `Module ${moduleName}`,
+        meta: {
+          filename: path.basename(f),
+          path: path.dirname(f),
+        },
+        kind: 'module',
+        category: classDoclet.category,
+        name: moduleName,
+        longname: `module:${moduleName}`,
+      };
+      reprocessDoclet(doclet);
+      return doclet;
+    });
+    modules.forEach(m => doclets.push(m));
+  },
+
   /**
-   * Add a category property based on the @category tag, or 'other' if none is provided.
+   * Extends the specified doclet with several properties, including the category property based on the @category tag.
    * @param {Object} e - The parsing event.
    */
   newDoclet: (e) => {
     const { doclet } = e;
-    Object.keys(processConfig)
-      .filter((k) => processConfig[k].condition === undefined || processConfig[k].condition(doclet))
-      .forEach((k) => (processConfig[k].process || defaultProcess(processConfig[k], k))(doclet));
-  }
+    reprocessDoclet(doclet);
+  },
 };
 
 /**
@@ -171,6 +255,6 @@ exports.defineTags = (dictionary) => {
   dictionary.defineTag('category', {
     onTagged: (doclet, tag) => {
       doclet.category = tag.text.toLocaleLowerCase();
-    }
+    },
   });
 };
