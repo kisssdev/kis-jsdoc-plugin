@@ -13,6 +13,7 @@ const env = require('jsdoc/env');
  * The configuration of the document generator.
  */
 const config = {
+  imageext: (env.conf.templates && env.conf.templates.markdown && env.conf.templates.markdown.imageext) || 'svg',
   docFolder: env.opts.destination,
   rootFolder: env.opts.template,
   encoding: env.opts.encoding,
@@ -22,6 +23,18 @@ const config = {
   externallinks: (env.conf.templates && env.conf.templates.markdown && env.conf.templates.markdown.externallinks) || {},
   badgecolors: (env.conf.templates && env.conf.templates.markdown && env.conf.templates.markdown.badgecolors) || {},
 };
+
+/**
+ * The order of constants, functions and members based on their access
+ */
+const order = { public: 0, protected: 1, private: 2 };
+
+/**
+ * Sorts doclets by their access property
+ * @param {Doclet} d1 - first doclet
+ * @param {Doclet} d2 - second doclet
+ */
+const accessSorter = (d1, d2) => order[d1.access] - order[d2.access];
 
 /**
  * Converts an array of object to a dictionary.
@@ -163,6 +176,15 @@ function generateDocfile(model, template, docfilename) {
  */
 function generateDoc(doclet, template, typesIndex) {
   generateLinks(doclet, typesIndex);
+  // sort children doclets by access
+  if (doclet.functions) doclet.functions.sort(accessSorter);
+  if (doclet.constants) doclet.constants.sort(accessSorter);
+  if (doclet.classes) {
+    doclet.classes.forEach((c) => {
+      if (c.functions) c.functions.sort(accessSorter);
+      if (c.members) c.members.sort(accessSorter);
+    });
+  }
   generateDocfile(doclet, template, defineDocfilename(doclet));
 }
 
@@ -187,7 +209,7 @@ function generateToc(rootNode, template) {
 }
 
 /**
- * Copy the resources - i.e. images or svg - to the final documentation folder.
+ * Copies the resources - i.e. images or svg - to the final documentation folder.
  */
 function copyResources() {
   const resourcesFolder = path.join(config.rootFolder, 'resources');
@@ -212,7 +234,9 @@ function initHandlebars(typesIndex) {
         .join(', ')
       : '';
   });
+  const options = { imageext: config.imageext };
   Handlebars.registerHelper('link', item => (typesIndex[item] ? `[${item}](${typesIndex[item]})` : `\`${item}\``));
+  Handlebars.registerHelper('options', context => options[context]);
   return compileTemplates();
 }
 

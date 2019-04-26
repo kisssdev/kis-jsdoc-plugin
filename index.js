@@ -141,17 +141,17 @@ const processConfig = {
     value: d => d.returns[0].type,
   },
   memberof: {
-    // modify the 'memberof' property: try to add the correct value if none found
+    // modify the 'memberof' property: fix 'export default var'
     condition: d => d.kind !== 'module' && !d.memberof && d.longname.startsWith('module:'),
-    value: d => d.longname // deal with the export default...
-    ,
+    value: d => d.longname,
   },
   access: {
     // modify the 'access' property: add a default value ('private') if none found
     condition: d => !d.access,
     value: (d) => {
       if (d.memberof && exportedClasses.includes(d.memberof) && d.name.charAt(0) !== '_') return 'public';
-      if ((d.kind === 'constant' || d.kind === 'function') && d.meta.code.name.startsWith('exports.')) return 'public';
+      if ((d.kind === 'constant' || d.kind === 'function') &&
+        (d.meta.code.name.startsWith('exports.') || d.meta.code.name === 'module.exports')) return 'public';
       return 'private';
     },
   },
@@ -164,8 +164,13 @@ const processConfig = {
     condition: d => d.kind === 'module',
     value: d => getModuleName(d.meta.filename, d.meta.path),
   },
+  isDefault: {
+    // new 'isDefault' property that indicates if the documented object is the default export of the module
+    condition: d => d.kind !== 'module' && d.name.startsWith('module:'),
+    process: (d) => { d.isDefault = true; d.name = 'default'; },
+  },
   inject: {
-    // new 'inject' property that indicates if the documented object is decorated with the @inject decorator?
+    // new 'inject' property that indicates if the documented object is decorated with the @inject decorator
     condition: d => d.kind === 'class' && d.meta.code.node.decorators && d.meta.code.node.decorators.length > 0,
     value: d => d.meta.code.node.decorators
       .map((dec) => {
@@ -235,7 +240,7 @@ exports.handlers = {
   },
 
   /**
-   * Extends the specified doclet with several properties, including the category property based on the @category tag.
+   * Extends the specified doclet with several properties, including the category property based on the \@category tag.
    * @param {Object} e - The parsing event.
    */
   newDoclet: (e) => {
