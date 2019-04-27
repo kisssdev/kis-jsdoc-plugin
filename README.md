@@ -24,7 +24,7 @@ npm install --save-dev kis-jsdoc-plugin
 
 Create or modify your `.jsdoc.json` config file to reference the `kis-jsdoc-plugin` plugin and the `markdown` custom template:
 
-```json
+```javascript
 {
   "tags": {
     "allowUnknownTags": true
@@ -119,7 +119,7 @@ bar(myClass) {
 
 You can also add external links to classes in the configuration file like this:
 
-```json
+```javascript
 {
   "templates": {
       "externallinks": {
@@ -155,7 +155,7 @@ __client__ | [HttpClient](https://aurelia.io/docs/api/fetch-client/class/HttpCli
 
 You can opt out the generation of private members or functions with the following configuration:
 
-```json
+```javascript
 {
   "opts": {
     "includes": "public"  /* default is "public,protected,private" */
@@ -166,7 +166,7 @@ You can opt out the generation of private members or functions with the followin
 
 The modifiers like `public, private, protected, static, abstract` are represented by an svg badge. You can opt out for a png file in case svg does not fit your need. Use this configuration:
 
-```json
+```javascript
 {
   "templates": {
     "markdown": {
@@ -188,7 +188,7 @@ export class UserSettings {
 
 A badge will be generated for the category and you can define the _order_ and the _color_ in the configuration file like this
 
-```json
+```javascript
 {
   "templates": {
     "markdown": {
@@ -215,10 +215,10 @@ For a module or class, you can add a png image to the `{your_doc_folder}/images/
 
 You can provide your own [handlebars](https://handlebarsjs.com) templates for the markdown generation by specifying the folder in the configuration file:
 
-```json
+```javascript
 {
   "opts": {
-    "template": "{your_template_folder}",  // the default is node_modules/kis-jsdoc-plugin/templates/markdown
+    "template": "{your_template_folder}",  /* the default is node_modules/kis-jsdoc-plugin/templates/markdown */
 ```
 
 You need to provide two handlebars files :
