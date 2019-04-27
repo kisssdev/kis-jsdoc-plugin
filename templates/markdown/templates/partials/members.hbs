@@ -1,10 +1,16 @@
 {{#if members}}
 
 ## Members
-
-Name | Type | Description
---- | --- | ---
 {{#each members}}
-__{{name}}__ | {{#link type.names.[0]}}{{/link}} | *{{description}}*
+
+### `{{name}}`
+
+{{> modifiers}}
+
+{{description}}
+
+{{> examples level='####' }}
+
+---
 {{/each}}
 {{/if}}

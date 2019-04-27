@@ -1,0 +1,35 @@
+{
+  "tags": {
+    "allowUnknownTags": true
+  },
+  "source": {
+    "include": ["."],
+    "exclude": ["node_modules"]
+  },
+  "opts": {
+    "template": "node_modules/kis-jsdoc-plugin/templates/markdown",
+    "encoding": "utf8",
+    "destination": "./doc/",
+    "recurse": true,
+    "includes": "public,private"
+  },
+  "plugins": ["node_modules/jsdoc-escape-at", "node_modules/kis-jsdoc-plugin"],
+  "templates": {
+    "markdown": {
+      "tocfilename": "toc.md",
+      "tocOrder": {
+        "jsdocplugin": 1,
+        "jsdoctemplate": 2,
+        "core": 3
+      },
+      "badgecolors": {
+        "jsdocplugin": "009663",
+        "jsdoctemplate": "00A800",
+        "core": "9f9f9f"
+      },
+      "externallinks": {
+        "Promise": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise"
+      }
+    }
+  }
+}

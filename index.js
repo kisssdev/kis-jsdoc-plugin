@@ -1,6 +1,7 @@
 /**
- * Defines a jsdoc plugin that adds custom properties to doclets and provides a new category tag.
+ * Defines a JSDoc plugin that adds custom properties to doclets and provides a new category tag.
  * @module
+ * @category JSDocPlugin
  */
 
 const path = require('path');
@@ -12,7 +13,7 @@ const env = require('jsdoc/env');
 const exportedClasses = [];
 
 /**
- * Get the absolute file path corresponding to the specified doclet.
+ * Gets the absolute file path corresponding to the specified doclet.
  * @param {Doclet} d - the specified doclet
  * @returns {string} the absolute file path
  */
@@ -53,7 +54,7 @@ const defaultProcess = (cf, k) => (d) => {
 };
 
 /**
- * The configuration of the jsdoc plugin.
+ * The configuration of the JSDoc plugin.
  */
 const config = {
   docFolder: env.opts.destination,
@@ -61,22 +62,23 @@ const config = {
     .toLowerCase()
     .replace(' ', '')
     .split(','),
-  badgecolors: (env.conf.templates && env.conf.templates.markdown && env.conf.templates.markdown.badgecolors) || {},
+  badgecolors: (env.conf && env.conf.templates
+    && env.conf.templates.markdown && env.conf.templates.markdown.badgecolors) || {},
 };
 
 /**
- * Configuration used to process jsdoc doclet instance.
+ * The configuration of the doclet processing.
  * Each key of the configuration object defines a process:
- * - either explicitly with the 'process' function,
- * - either implictly by applying a value to the corresponding key property of the doclet instance. In such case, the 'value' function is used.
- * In both cases, the process is executed if there is no 'condition' function, or if the 'condition' function evaluates to true.
+ * - either explicitly if the 'process' function is defined,
+ * - either implictly if the 'value' function is defined : in such case the process consists of applying a value to the corresponding key property of the doclet instance.
+ * - In both cases, the process is executed if there is no 'condition' function, or if the 'condition' function evaluates to true.
  * @type {Object.<{condition: function, process: function, value: function}>}
  */
 const processConfig = {
   isExportedClass: {
     // new 'isExportedClass' property that indicates if the class is exported
     condition: d =>
-      d.kind === 'class' &&
+      d.kind === 'class' && d.meta.code && d.meta.code.name &&
       (d.meta.code.name.startsWith('export') || (d.tags && d.tags.some(t => t.title === 'export'))),
     process: d => exportedClasses.push(d.name),
   },
@@ -118,7 +120,7 @@ const processConfig = {
   },
   categorycolor: {
     // new 'categorycolor' property
-    value: d => config.badgecolors[d.category],
+    value: d => config.badgecolors[d.category] || 'blue',
   },
   static: {
     // new 'relativepath' property that indicates if the documented object is static?
@@ -142,7 +144,7 @@ const processConfig = {
   },
   memberof: {
     // modify the 'memberof' property: fix 'export default var'
-    condition: d => d.kind !== 'module' && !d.memberof && d.longname.startsWith('module:'),
+    condition: d => d.kind !== 'module' && !d.memberof && d.longname && d.longname.startsWith('module:'),
     value: d => d.longname,
   },
   access: {
@@ -150,8 +152,9 @@ const processConfig = {
     condition: d => !d.access,
     value: (d) => {
       if (d.memberof && exportedClasses.includes(d.memberof) && d.name.charAt(0) !== '_') return 'public';
-      if ((d.kind === 'constant' || d.kind === 'function') &&
-        (d.meta.code.name.startsWith('exports.') || d.meta.code.name === 'module.exports')) return 'public';
+      if ((d.kind === 'constant' || d.kind === 'function' || d.kind === 'member') &&
+        (d.meta.code && d.meta.code.name &&
+          (d.meta.code.name.startsWith('exports.') || d.meta.code.name === 'module.exports'))) return 'public';
       return 'private';
     },
   },
@@ -166,12 +169,13 @@ const processConfig = {
   },
   isDefault: {
     // new 'isDefault' property that indicates if the documented object is the default export of the module
-    condition: d => d.kind !== 'module' && d.name.startsWith('module:'),
+    condition: d => d.kind !== 'module' && d.name && d.name.startsWith('module:'),
     process: (d) => { d.isDefault = true; d.name = 'default'; },
   },
   inject: {
     // new 'inject' property that indicates if the documented object is decorated with the @inject decorator
-    condition: d => d.kind === 'class' && d.meta.code.node.decorators && d.meta.code.node.decorators.length > 0,
+    condition: d => d.kind === 'class' && d.meta.code && d.meta.code.node && d.meta.code.node.decorators
+      && d.meta.code.node.decorators.length > 0,
     value: d => d.meta.code.node.decorators
       .map((dec) => {
         let decoratorName = '';
@@ -184,75 +188,79 @@ const processConfig = {
 };
 
 /**
- * Reprocess the specified doclet to add or modify properties based on the processConfig object.
+ * Processes the specified doclet to add or modify properties based on the processConfig object.
  * @param {Doclet} doclet - the specified doclet
  */
-const reprocessDoclet = doclet =>
+const processDoclet = doclet =>
   Object.keys(processConfig)
     .filter(k => processConfig[k].condition === undefined || processConfig[k].condition(doclet))
     .forEach(k => (processConfig[k].process || defaultProcess(processConfig[k], k))(doclet));
 
 /**
- * This plugin completes the jsdoc doclet with new properties when the doclet is created.
+ * Processes the parsed doclets to provide a better hierarchy.
+ * @param {Array.<Doclet>} doclets - The array of parsed doclets.
+ */
+const processDoclets = (doclets) => {
+  // 1: all js files with comments
+  const documentedFiles = new Set(doclets.filter(d => !d.undocumented).map(d => getFilePath(d)));
+  // 2: js files documented as @module
+  const documentedAsModuleFiles = new Set(doclets
+    .filter(d => d.kind === 'module' && !d.undocumented).map(d => getFilePath(d)));
+  // define the (1-2) remaining files that will now be documented through new 'parent' module doclets
+  const toDocumentAsModuleFiles = [...documentedFiles].filter(x => !documentedAsModuleFiles.has(x));
+  // retrieve documented global class and functions and configure memberof so that they will be attached
+  // to their new 'parent' module doclets
+  const classDoclets = doclets.filter(d => d.kind === 'class' && d.scope === 'global' && !d.undocumented);
+  classDoclets.forEach((d) => {
+    d.memberof = `module:${d.name}`;
+  });
+  const functionsDoclets = doclets.filter(d => d.kind === 'function' && d.scope === 'global' && !d.undocumented);
+  functionsDoclets.forEach((d) => {
+    const moduleName = getModuleName(d.meta.filename, d.meta.path);
+    d.memberof = `module:${moduleName}`;
+  });
+  // class dictionary to copy some class properties to the new 'parent' module doclets
+  const documentedAsClassFiles = new Map(classDoclets.map(d => [getFilePath(d), d]));
+  // the new parent module doclets to be created
+  const modules = toDocumentAsModuleFiles.map((f) => {
+    const classDoclet = documentedAsClassFiles.has(f) ? documentedAsClassFiles.get(f) : {};
+    const moduleName = getModuleName(path.basename(f), path.dirname(f));
+    const doclet = {
+      tocDescription: classDoclet.classdesc || `Module ${moduleName}`,
+      meta: {
+        filename: path.basename(f),
+        path: path.dirname(f),
+      },
+      kind: 'module',
+      category: classDoclet.category,
+      name: moduleName,
+      longname: `module:${moduleName}`,
+    };
+    processDoclet(doclet);
+    return doclet;
+  });
+  modules.forEach(m => doclets.push(m));
+};
+
+/**
+ * Defines the event handlers of the JSDoc plugin.
+ * @type {Object.<{parseComplete:function, newDoclet: function}>}
  */
 exports.handlers = {
   parseComplete: (e) => {
     const { doclets } = e;
-    // 1: all js files with comments
-    const documentedFiles = new Set(doclets.filter(d => !d.undocumented).map(d => getFilePath(d)));
-    // 2: js files documented as @module
-    const documentedAsModuleFiles = new Set(doclets
-      .filter(d => d.kind === 'module' && !d.undocumented).map(d => getFilePath(d)));
-    // define the (1-2) remaining files that will now be documented through new 'parent' module doclets
-    const toDocumentAsModuleFiles = [...documentedFiles].filter(x => !documentedAsModuleFiles.has(x));
-    // retrieve documented global class and functions and configure memberof so that they will be attached
-    // to their new 'parent' module doclets
-    const classDoclets = doclets.filter(d => d.kind === 'class' && d.scope === 'global' && !d.undocumented);
-    classDoclets.forEach((d) => {
-      d.memberof = `module:${d.name}`;
-    });
-    const functionsDoclets = doclets.filter(d => d.kind === 'function' && d.scope === 'global' && !d.undocumented);
-    functionsDoclets.forEach((d) => {
-      const moduleName = getModuleName(d.meta.filename, d.meta.path);
-      d.memberof = `module:${moduleName}`;
-    });
-    // class dictionary to copy some class properties to the new 'parent' module doclets
-    const documentedAsClassFiles = new Map(classDoclets.map(d => [getFilePath(d), d]));
-    // the new parent module doclets to be created
-    const modules = toDocumentAsModuleFiles.map((f) => {
-      const classDoclet = documentedAsClassFiles.has(f) ? documentedAsClassFiles.get(f) : {};
-      const moduleName = getModuleName(path.basename(f), path.dirname(f));
-      const doclet = {
-        tocDescription: classDoclet.classdesc || `Module ${moduleName}`,
-        meta: {
-          filename: path.basename(f),
-          path: path.dirname(f),
-        },
-        kind: 'module',
-        category: classDoclet.category,
-        name: moduleName,
-        longname: `module:${moduleName}`,
-      };
-      reprocessDoclet(doclet);
-      return doclet;
-    });
-    modules.forEach(m => doclets.push(m));
+    processDoclets(doclets);
   },
-
-  /**
-   * Extends the specified doclet with several properties, including the category property based on the \@category tag.
-   * @param {Object} e - The parsing event.
-   */
   newDoclet: (e) => {
     const { doclet } = e;
-    reprocessDoclet(doclet);
+    processDoclet(doclet);
   },
 };
 
 /**
- * This plugin defines a new jsdoc tag 'category' that accepts a text value.
+ * Defines a new JSDoc tag 'category' that accepts a text value.
  * This adds a corresponding 'category' property on the corresponding doclet.
- * @param {Object} dictionary - The jsdoc dictionary.
+ * @param {Object} dictionary - The JSDoc dictionary.
  * @example
  * \@category Model
  */

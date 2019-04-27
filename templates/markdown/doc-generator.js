@@ -1,6 +1,7 @@
 /**
  * Defines a markdown document generator that uses handlebars templates.
  * @module
+ * @category Core
  */
 const fs = require('fs-extra');
 const path = require('path');
@@ -39,9 +40,15 @@ const accessSorter = (d1, d2) => order[d1.access] - order[d2.access];
 /**
  * Converts an array of object to a dictionary.
  * @param {Array.<Object>} arr - The array of objects to convert to dictionary.
- * @param {function} keyGenerator - The function used to set the key of the object added to the dictionary.
- * @param {function} [valueGenerator=(item, index)=>item] - The function used to set the value of the object added to the dictionary.
+ * @param {function} keyGenerator - The function used to define the key of the object added to the dictionary.
+ * @param {function} [valueGenerator=(item, index)=>item] - The function used to define the value of the object added to the dictionary.
  * @return {Object} The object acting as a dictionary.
+ * @example
+ * let res = toDictionary([{n:'a', v:1}, {n:'b', v:2}], o => o.n, o => o.v);
+ * // res is {a: 1, b: 2 }
+ * @example
+ * let res = toDictionary([{n:'a', v:1}, {n:'b', v:2}], o => o.n);
+ * // res is {a: {n:'a', v:1}, b: {n:'b', v:2} }
  */
 const toDictionary = (arr, keyGenerator, valueGenerator = item => item) =>
   arr.reduce((acc, item, index) => {
@@ -72,9 +79,9 @@ const keyBy = (arr, keySelector, valueSelector = item => item) =>
   }, {});
 
 /**
- * Transforms {\@link MyClass} or {\@link url|A text} inline tags within the specified jsdoc doclet
+ * Transforms {\@link MyClass} or {\@link url|A text} inline tags within the specified JSDoc doclet
  * to a markdown link to the associated type documentation.
- * @param {Doclet} doclet - The jsdoc doclet to transform.
+ * @param {Doclet} doclet - The JSDoc doclet to transform.
  * @param {Object.<string>} typesIndex - The types index - associating a type with its documentation file.
  */
 function generateLinks(doclet, typesIndex) {
@@ -136,8 +143,8 @@ function compileTemplates() {
 }
 
 /**
- * Defines the name of the documentation file of the specified jsdoc doclet.
- * @param {Doclet} doclet - The specified jsdoc doclet.
+ * Defines the name of the documentation file of the specified JSDoc doclet.
+ * @param {Doclet} doclet - The specified JSDoc doclet.
  * @return {string} The documentation file name.
  */
 function defineDocfilename(doclet) {
@@ -169,8 +176,8 @@ function generateDocfile(model, template, docfilename) {
 }
 
 /**
- * Generates the documentation for the given jsdoc doclet.
- * @param {Doclet} doclet - The jsdoc doclet for which the documentation will be generated.
+ * Generates the documentation for the given JSDoc doclet.
+ * @param {Doclet} doclet - The JSDoc doclet for which the documentation will be generated.
  * @param {Template} template - The handlebars template.
  * @param {Object.<string>} typesIndex - The types index - associating a type with its documentation file.
  */

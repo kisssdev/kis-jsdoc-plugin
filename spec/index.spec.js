@@ -1,9 +1,27 @@
+/* eslint-disable linebreak-style */
 /* global describe, it, expect, jasmine */
 const mock = require('mock-require');
 
 mock('jsdoc/env', {
   opts: {
     destination: 'test',
+  },
+  conf: {
+    templates: {
+      markdown: {
+        tocfilename: 'toc.md',
+        tocOrder: {
+          test1: 1,
+          test2: 2,
+        },
+        badgecolors: {
+          cat1: 'FFFFFF',
+        },
+        externallinks: {
+          Test: 'externallink',
+        },
+      },
+    },
   },
 });
 
@@ -13,6 +31,7 @@ const systemUndertest = require('../index');
 describe('KisJsdocPlugin', () => {
   describe('exports.handlers', () => {
     describe('newDoclet', () => {
+
       it('creates a property "static":true when "scope":static.', () => {
         const doclet = {
           meta: {
@@ -28,6 +47,7 @@ describe('KisJsdocPlugin', () => {
           static: true,
         }));
       });
+
       it('creates a property "tocDescription" for module that matches description property.', () => {
         const expectedDescription = 'test';
         const doclet = {
@@ -45,17 +65,13 @@ describe('KisJsdocPlugin', () => {
           tocDescription: expectedDescription,
         }));
       });
-      it('creates a property "tocDescription" for class that matches classdesc property.', () => {
-        const expectedDescription = 'test';
+
+      it('creates a property "category" with default value when none specified.', () => {
+        const expectedCategory = 'other';
         const doclet = {
-          kind: 'class',
-          classdesc: expectedDescription,
+          kind: 'module',
+          description: 'module',
           meta: {
-            code: {
-              node: {
-                type: '',
-              },
-            },
             path: 'path',
             filename: 'filename',
           },
@@ -64,7 +80,45 @@ describe('KisJsdocPlugin', () => {
           doclet,
         });
         expect(doclet).toEqual(jasmine.objectContaining({
-          tocDescription: expectedDescription,
+          category: expectedCategory,
+        }));
+      });
+
+      it('creates a property "categorycolor" with configured value.', () => {
+        const expectedColor = 'FFFFFF';
+        const doclet = {
+          kind: 'module',
+          description: 'module',
+          category: 'cat1',
+          meta: {
+            path: 'path',
+            filename: 'filename',
+          },
+        };
+        systemUndertest.handlers.newDoclet({
+          doclet,
+        });
+        expect(doclet).toEqual(jasmine.objectContaining({
+          categorycolor: expectedColor,
+        }));
+      });
+
+      it('creates a property "categorycolor" with default value "blue" if not configured.', () => {
+        const expectedColor = 'blue';
+        const doclet = {
+          kind: 'module',
+          description: 'module',
+          category: 'catundefined',
+          meta: {
+            path: 'path',
+            filename: 'filename',
+          },
+        };
+        systemUndertest.handlers.newDoclet({
+          doclet,
+        });
+        expect(doclet).toEqual(jasmine.objectContaining({
+          categorycolor: expectedColor,
         }));
       });
     });

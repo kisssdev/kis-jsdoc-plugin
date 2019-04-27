@@ -1,10 +1,11 @@
 {
   "name": "kis-jsdoc-plugin",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A jsdoc plugin associated with a custom template that generates markdown documentation in a 'Keep It Simple' way.",
   "main": "index.js",
   "scripts": {
-    "test": "jasmine"
+    "test": "/node_modules/.bin/jasmine",
+    "doc": "./node_modules/.bin/jsdoc -c ./.jsdoc.json"
   },
   "repository": {
     "type": "git",
@@ -34,6 +35,9 @@
     "eslint-plugin-import": "^2.8.0",
     "jasmine": "^2.8.0",
     "jasmine-spec-reporter": "^4.2.1",
+    "jsdoc": "git+https://github.com/jsdoc3/jsdoc.git",
+    "jsdoc-escape-at": "^1.0.1",
+    "kis-jsdoc-plugin": "^1.1.0",
     "mock-require": "^3.0.1"
   }
 }

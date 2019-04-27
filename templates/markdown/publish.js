@@ -1,14 +1,15 @@
 /**
- * Defines a jsdoc template that creates a code tree based on the jsdoc doclets
+ * Defines a JSDoc template that creates a code tree based on the JSDoc doclets
  * and calls the docgenerator.
  * @module
+ * @category JSDocTemplate
  */
 
 const docGenerator = require('./doc-generator');
 
 /**
  * Configuration used to build the documentation tree.
- * Each key is a jsdoc doclet kind, expliciting the children collection name that will be created
+ * Each key is a JSDoc doclet kind, expliciting the children collection name that will be created
  * and if a recursive parsing is required to build this collection.
  * @type {Object.<{childrenCollection: string, recurse: boolean}>}
  */
@@ -24,10 +25,10 @@ const configuration = {
 };
 
 /**
- * Attaches the given jsdoc doclet to the given parent node.
- * @param {Doclet} doclet - The jsdoc doclet to attach.
- * @param {Doclet} parentNode - The parent node on which to attach the jsdoc doclet.
- * @param {Array.<Doclet>} doclets - The array of all jsdoc doclets.
+ * Attaches the given JSDoc doclet to the given parent node.
+ * @param {Doclet} doclet - The JSDoc doclet to attach.
+ * @param {Doclet} parentNode - The parent node on which to attach the JSDoc doclet.
+ * @param {Array.<Doclet>} doclets - The array of all JSDoc doclets.
  */
 function attachToParent(doclet, parentNode, doclets) {
   // identify the process depending of the doclet kind
@@ -46,8 +47,8 @@ function attachToParent(doclet, parentNode, doclets) {
 /**
  * Builds the documentation tree recursively.
  * @param {Doclet} parentNode - The parent node.
- * @param {Array.<Doclet>} doclets - The array of all jsdoc doclets.
- * @param {string} parentLongname - The jsdoc long name of the parent.
+ * @param {Array.<Doclet>} doclets - The array of all JSDoc doclets.
+ * @param {string} parentLongname - The JSDoc long name of the parent.
  */
 function buildTree(parentNode, doclets, parentLongname) {
   doclets
@@ -56,9 +57,9 @@ function buildTree(parentNode, doclets, parentLongname) {
 }
 
 /**
- * Builds a tree of jsdoc doclet data and generates documentation.
+ * Builds a tree of JSDoc doclet data and generates documentation.
  *   @param {TAFFY} data - The database containing comments and tags.
- *   @param {Object} opts - The jsdoc options.
+ *   @param {Object} opts - The JSDoc options.
  */
 exports.publish = (data, opts) => {
   // filter Taffy database to remove undocumented doclets
