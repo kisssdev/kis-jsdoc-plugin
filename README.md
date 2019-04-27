@@ -145,6 +145,7 @@ The following comment in your code:
 will generate this:
 
 Creates an instance of the SettingsService with the specified parameters.
+
 Parameters | Type | Description
 --- | --- | ---
 __client__ | [HttpClient](https://aurelia.io/docs/api/fetch-client/class/HttpClient) | *the fetch http client*
