@@ -149,8 +149,6 @@ Parameters | Type | Description
 --- | --- | ---
 __client__ | [HttpClient](https://aurelia.io/docs/api/fetch-client/class/HttpClient) | *the fetch http client*
 
----
-
 ## Exclude private code
 
 You can opt out the generation of private members or functions with the following configuration:
@@ -186,8 +184,7 @@ You can add whatever category you want.
 export class UserSettings {
 ```
 
-A badge will be generated for the category and you can define the _order_ and the _color_ in the configuration file like this
-
+You can modify the order of the categories in the table of contents with the following configuration:
 ```javascript
 {
   "templates": {
@@ -195,17 +192,32 @@ A badge will be generated for the category and you can define the _order_ and th
       "tocOrder": {
         "model": 1,
         "viewmodel": 2
-      },
+      }
+```
+
+A badge will be generated for the category and you can define the _color_ with the following configuration:
+
+```javascript
+{
+  "templates": {
+    "markdown": {
       "badgecolors": {
         "model": "009663",
         "viewmodel": "00A800"
-      },
-
+      }
 ```
 
 ## Table of contents
 
-A table of contents documentation is generated in a separated file. You can change the name in the configuration file.
+A table of contents documentation is generated in a separated file. You can change the name in the configuration file:
+
+```javascript
+{
+  "templates": {
+    "markdown": {
+      "tocfilename": "toc.md"
+    }
+```
 
 ## Screenshots
 
