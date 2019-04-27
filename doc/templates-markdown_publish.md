@@ -14,6 +14,7 @@ and calls the docgenerator.
 ![modifier: public](images/badges/modifier-public.svg) ![modifier: static](images/badges/modifier-static.svg)
 
 Builds a tree of JSDoc doclet data and generates documentation.
+
 Parameters | Type | Description
 --- | --- | ---
 __data__ | `TAFFY` | *The database containing comments and tags.*
@@ -26,6 +27,7 @@ __opts__ | `Object` | *The JSDoc options.*
 ![modifier: private](images/badges/modifier-private.svg)
 
 Attaches the given JSDoc doclet to the given parent node.
+
 Parameters | Type | Description
 --- | --- | ---
 __doclet__ | `Doclet` | *The JSDoc doclet to attach.*
@@ -39,6 +41,7 @@ __doclets__ | `Array.<Doclet>` | *The array of all JSDoc doclets.*
 ![modifier: private](images/badges/modifier-private.svg)
 
 Builds the documentation tree recursively.
+
 Parameters | Type | Description
 --- | --- | ---
 __parentNode__ | `Doclet` | *The parent node.*

@@ -13,6 +13,7 @@ Defines a markdown document generator that uses handlebars templates.
 ![modifier: public](images/badges/modifier-public.svg) ![modifier: static](images/badges/modifier-static.svg)
 
 Generates the documentation.
+
 Parameters | Type | Description
 --- | --- | ---
 __rootNode__ | `Object` | *The documentation root node.*
@@ -24,6 +25,7 @@ __rootNode__ | `Object` | *The documentation root node.*
 ![modifier: private](images/badges/modifier-private.svg)
 
 Sorts doclets by their access property
+
 Parameters | Type | Description
 --- | --- | ---
 __d1__ | `Doclet` | *first doclet*
@@ -36,6 +38,7 @@ __d2__ | `Doclet` | *second doclet*
 ![modifier: private](images/badges/modifier-private.svg)
 
 Converts an array of object to a dictionary.
+
 Parameters | Type | Description
 --- | --- | ---
 __arr__ | `Array.<Object>` | *The array of objects to convert to dictionary.*
@@ -62,6 +65,7 @@ let res = toDictionary([{n:'a', v:1}, {n:'b', v:2}], o => o.n);
 
 Converts an array of object to an object containing arrays.
 The value produced by the specified keySelector is used to define the properties of the resulting object.
+
 Parameters | Type | Description
 --- | --- | ---
 __arr__ | `Array.<Object>` | *The array of objects to convert to dictionary.*
@@ -88,6 +92,7 @@ let res = keyBy([{n:'a', v:1}, {n:'b', v:2}, {n:'a', v:3}], o => o.n);
 
 Transforms {@link MyClass} or {@link url|A text} inline tags within the specified JSDoc doclet
 to a markdown link to the associated type documentation.
+
 Parameters | Type | Description
 --- | --- | ---
 __doclet__ | `Doclet` | *The JSDoc doclet to transform.*
@@ -101,6 +106,7 @@ __typesIndex__ | `Object.<string>` | *The types index - associating a type with 
 
 Compiles the handlebars templates and defines a templates index in the given folder.
 If registerAsPartial is true, templates are only precompiled and no index is returned.
+
 Parameters | Type | Description
 --- | --- | ---
 __*return*__ | `Object.<string>` | *The templates index - associating the name of the template with its handlebar compiled template.*
@@ -112,6 +118,7 @@ __*return*__ | `Object.<string>` | *The templates index - associating the name o
 ![modifier: private](images/badges/modifier-private.svg)
 
 Compiles the handlebars templates and defines a templates index.
+
 Parameters | Type | Description
 --- | --- | ---
 __*return*__ | `Object.<string>` | *The templates index - associating the name of the template with its handlebar compiled template.*
@@ -123,6 +130,7 @@ __*return*__ | `Object.<string>` | *The templates index - associating the name o
 ![modifier: private](images/badges/modifier-private.svg)
 
 Defines the name of the documentation file of the specified JSDoc doclet.
+
 Parameters | Type | Description
 --- | --- | ---
 __doclet__ | `Doclet` | *The specified JSDoc doclet.*
@@ -135,6 +143,7 @@ __*return*__ | `string` | *The documentation file name.*
 ![modifier: private](images/badges/modifier-private.svg)
 
 Generates the documentation file of the given model and handlebars template.
+
 Parameters | Type | Description
 --- | --- | ---
 __model__ | `Object` | *The model to use for the handlebars template.*
@@ -148,6 +157,7 @@ __docfilename__ | `string` | *The documentation file name.*
 ![modifier: private](images/badges/modifier-private.svg)
 
 Generates the documentation for the given JSDoc doclet.
+
 Parameters | Type | Description
 --- | --- | ---
 __doclet__ | `Doclet` | *The JSDoc doclet for which the documentation will be generated.*
@@ -161,6 +171,7 @@ __typesIndex__ | `Object.<string>` | *The types index - associating a type with 
 ![modifier: private](images/badges/modifier-private.svg)
 
 Generates the table of contents for the given documentation root node.
+
 Parameters | Type | Description
 --- | --- | ---
 __rootNode__ | `Object` | *The documentation root node for which the table of contents will be generated.*
@@ -181,6 +192,7 @@ Copies the resources - i.e. images or svg - to the final documentation folder.
 ![modifier: private](images/badges/modifier-private.svg)
 
 Initializes handlebars, registers custom helpers and compilates templates.
+
 Parameters | Type | Description
 --- | --- | ---
 __typesIndex__ | `Object.<string>` | *The types index - associating a type with its documentation file.*

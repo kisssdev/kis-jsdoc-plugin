@@ -121,7 +121,6 @@ You can also add external links to classes in the configuration file like this:
 
 ```json
 {
-  ...
   "templates": {
       "externallinks": {
         "HttpClient": "https://aurelia.io/docs/api/fetch-client/class/HttpClient",
@@ -158,7 +157,6 @@ You can opt out the generation of private members or functions with the followin
 
 ```json
 {
-  ...
   "opts": {
     "includes": "public"  // default is "public,protected,private"
   },
@@ -170,7 +168,6 @@ The modifiers like `public, private, protected, static, abstract` are represente
 
 ```json
 {
-  ...
   "templates": {
     "markdown": {
       "imageext": "png"  // default is "svg"
@@ -193,7 +190,6 @@ A badge will be generated for the category and you can define the _order_ and th
 
 ```json
 {
-  ...
   "templates": {
     "markdown": {
       "tocOrder": {
@@ -221,7 +217,6 @@ You can provide your own [handlebars](https://handlebarsjs.com) templates for th
 
 ```json
 {
-  ...
   "opts": {
     "template": "{your_template_folder}",  // the default is node_modules/kis-jsdoc-plugin/templates/markdown
 ```

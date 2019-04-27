@@ -14,6 +14,7 @@ Defines a JSDoc plugin that adds custom properties to doclets and provides a new
 
 Defines a new JSDoc tag &#x27;category&#x27; that accepts a text value.
 This adds a corresponding &#x27;category&#x27; property on the corresponding doclet.
+
 Parameters | Type | Description
 --- | --- | ---
 __dictionary__ | `Object` | *The JSDoc dictionary.*
@@ -31,6 +32,7 @@ __dictionary__ | `Object` | *The JSDoc dictionary.*
 ![modifier: private](images/badges/modifier-private.svg)
 
 Gets the absolute file path corresponding to the specified doclet.
+
 Parameters | Type | Description
 --- | --- | ---
 __d__ | `Doclet` | *the specified doclet*
@@ -43,6 +45,7 @@ __*return*__ | `string` | *the absolute file path*
 ![modifier: private](images/badges/modifier-private.svg)
 
 Converts a Kebab cased string in a Pascal cased string.
+
 Parameters | Type | Description
 --- | --- | ---
 __s__ | `string` | *The string in Kebab casing to convert in Pascal casing.*
@@ -56,6 +59,7 @@ __*return*__ | `string` | *- The Pascal cased string.*
 
 Get the module name corresponding to the given filename and path.
 In case of index.js the folder name is used.
+
 Parameters | Type | Description
 --- | --- | ---
 __filename__ | `string` | *the given filename*
@@ -69,6 +73,7 @@ __*return*__ | `string` | *the module name*
 ![modifier: private](images/badges/modifier-private.svg)
 
 Defines the default process on doclet: applying the &#x27;value&#x27; function defined on the configuration object to the specified key/property of the doclet instance.
+
 Parameters | Type | Description
 --- | --- | ---
 __cf__ | `Object` | *The configuration object.*
@@ -82,6 +87,7 @@ __*return*__ | `function` | *A function that takes a doclet as input and sets th
 ![modifier: private](images/badges/modifier-private.svg)
 
 Processes the specified doclet to add or modify properties based on the processConfig object.
+
 Parameters | Type | Description
 --- | --- | ---
 __doclet__ | `Doclet` | *the specified doclet*
@@ -93,6 +99,7 @@ __doclet__ | `Doclet` | *the specified doclet*
 ![modifier: private](images/badges/modifier-private.svg)
 
 Processes the parsed doclets to provide a better hierarchy.
+
 Parameters | Type | Description
 --- | --- | ---
 __doclets__ | `Array.<Doclet>` | *The array of parsed doclets.*
