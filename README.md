@@ -30,18 +30,18 @@ Create or modify your `.jsdoc.json` config file to reference the `kis-jsdoc-plug
     "allowUnknownTags": true
   },
   "source": {
-    "include": ["./src"] // the path to your documented source code
+    "include": ["./src"] /* the path to your documented source code */
   },
   "opts": {
     "template": "node_modules/kis-jsdoc-plugin/templates/markdown",
     "encoding": "utf8",
-    "destination": "./doc/", // the path to the generated documentation
+    "destination": "./doc/", /* the path to the generated documentation */
     "recurse": true
   },
   "plugins": ["node_modules/kis-jsdoc-plugin"],
   "templates": {
     "markdown": {
-      "tocfilename": "toc.md" // the name of the table of contents file
+      "tocfilename": "toc.md" /* the name of the table of contents file */
     }
   }
 }
@@ -158,7 +158,7 @@ You can opt out the generation of private members or functions with the followin
 ```json
 {
   "opts": {
-    "includes": "public"  // default is "public,protected,private"
+    "includes": "public"  /* default is "public,protected,private" */
   },
 ```
 
@@ -170,7 +170,7 @@ The modifiers like `public, private, protected, static, abstract` are represente
 {
   "templates": {
     "markdown": {
-      "imageext": "png"  // default is "svg"
+      "imageext": "png"  /* default is "svg" */
 ```
 
 ## Category
