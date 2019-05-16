@@ -24,24 +24,24 @@ npm install --save-dev kis-jsdoc-plugin
 
 Create or modify your `.jsdoc.json` config file to reference the `kis-jsdoc-plugin` plugin and the `markdown` custom template:
 
-```json
+```javascript
 {
   "tags": {
     "allowUnknownTags": true
   },
   "source": {
-    "include": ["./src"] // the path to your documented source code
+    "include": ["./src"] /* the path to your documented source code */
   },
   "opts": {
     "template": "node_modules/kis-jsdoc-plugin/templates/markdown",
     "encoding": "utf8",
-    "destination": "./doc/", // the path to the generated documentation
+    "destination": "./doc/", /* the path to the generated documentation */
     "recurse": true
   },
   "plugins": ["node_modules/kis-jsdoc-plugin"],
   "templates": {
     "markdown": {
-      "tocfilename": "toc.md" // the name of the table of contents file
+      "tocfilename": "toc.md" /* the name of the table of contents file */
     }
   }
 }
@@ -119,7 +119,7 @@ bar(myClass) {
 
 You can also add external links to classes in the configuration file like this:
 
-```json
+```javascript
 {
   "templates": {
       "externallinks": {
@@ -149,16 +149,14 @@ Parameters | Type | Description
 --- | --- | ---
 __client__ | [HttpClient](https://aurelia.io/docs/api/fetch-client/class/HttpClient) | *the fetch http client*
 
----
-
 ## Exclude private code
 
 You can opt out the generation of private members or functions with the following configuration:
 
-```json
+```javascript
 {
   "opts": {
-    "includes": "public"  // default is "public,protected,private"
+    "includes": "public"  /* default is "public,protected,private" */
   },
 ```
 
@@ -166,11 +164,11 @@ You can opt out the generation of private members or functions with the followin
 
 The modifiers like `public, private, protected, static, abstract` are represented by an svg badge. You can opt out for a png file in case svg does not fit your need. Use this configuration:
 
-```json
+```javascript
 {
   "templates": {
     "markdown": {
-      "imageext": "png"  // default is "svg"
+      "imageext": "png"  /* default is "svg" */
 ```
 
 ## Category
@@ -186,26 +184,40 @@ You can add whatever category you want.
 export class UserSettings {
 ```
 
-A badge will be generated for the category and you can define the _order_ and the _color_ in the configuration file like this
-
-```json
+You can modify the order of the categories in the table of contents with the following configuration:
+```javascript
 {
   "templates": {
     "markdown": {
       "tocOrder": {
         "model": 1,
         "viewmodel": 2
-      },
+      }
+```
+
+A badge will be generated for the category and you can define the _color_ with the following configuration:
+
+```javascript
+{
+  "templates": {
+    "markdown": {
       "badgecolors": {
         "model": "009663",
         "viewmodel": "00A800"
-      },
-
+      }
 ```
 
 ## Table of contents
 
-A table of contents documentation is generated in a separated file. You can change the name in the configuration file.
+A table of contents documentation is generated in a separated file. You can change the name in the configuration file:
+
+```javascript
+{
+  "templates": {
+    "markdown": {
+      "tocfilename": "toc.md"
+    }
+```
 
 ## Screenshots
 
@@ -215,10 +227,10 @@ For a module or class, you can add a png image to the `{your_doc_folder}/images/
 
 You can provide your own [handlebars](https://handlebarsjs.com) templates for the markdown generation by specifying the folder in the configuration file:
 
-```json
+```javascript
 {
   "opts": {
-    "template": "{your_template_folder}",  // the default is node_modules/kis-jsdoc-plugin/templates/markdown
+    "template": "{your_template_folder}",  /* the default is node_modules/kis-jsdoc-plugin/templates/markdown */
 ```
 
 You need to provide two handlebars files :
