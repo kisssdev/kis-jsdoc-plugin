@@ -153,7 +153,7 @@ const processConfig = {
     value: (d) => {
       if (d.memberof && exportedClasses.includes(d.memberof) && d.name.charAt(0) !== '_') return 'public';
       if ((d.kind === 'constant' || d.kind === 'function' || d.kind === 'member') &&
-        (d.meta.code && d.meta.code.name &&
+        (d.meta.code && d.meta.code.name && d.meta.code.name.length > 0 &&
           (d.meta.code.name.startsWith('exports.') || d.meta.code.name === 'module.exports'))) return 'public';
       return 'private';
     },
