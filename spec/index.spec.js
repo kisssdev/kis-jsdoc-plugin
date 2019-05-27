@@ -34,18 +34,11 @@ describe('KisJsdocPlugin', () => {
 
       it('creates a property "static":true when "scope":static.', () => {
         const doclet = {
-          meta: {
-            path: 'path',
-            filename: 'filename',
-          },
+          meta: { path: 'path', filename: 'filename', },
           scope: 'static',
         };
-        systemUndertest.handlers.newDoclet({
-          doclet,
-        });
-        expect(doclet).toEqual(jasmine.objectContaining({
-          static: true,
-        }));
+        systemUndertest.handlers.newDoclet({ doclet, });
+        expect(doclet).toEqual(jasmine.objectContaining({ static: true, }));
       });
 
       it('creates a property "tocDescription" for module that matches description property.', () => {
@@ -53,17 +46,10 @@ describe('KisJsdocPlugin', () => {
         const doclet = {
           kind: 'module',
           description: expectedDescription,
-          meta: {
-            path: 'path',
-            filename: 'filename',
-          },
+          meta: { path: 'path', filename: 'filename', },
         };
-        systemUndertest.handlers.newDoclet({
-          doclet,
-        });
-        expect(doclet).toEqual(jasmine.objectContaining({
-          tocDescription: expectedDescription,
-        }));
+        systemUndertest.handlers.newDoclet({ doclet, });
+        expect(doclet).toEqual(jasmine.objectContaining({ tocDescription: expectedDescription, }));
       });
 
       it('creates a property "category" with default value when none specified.', () => {
@@ -71,17 +57,10 @@ describe('KisJsdocPlugin', () => {
         const doclet = {
           kind: 'module',
           description: 'module',
-          meta: {
-            path: 'path',
-            filename: 'filename',
-          },
+          meta: { path: 'path', filename: 'filename', },
         };
-        systemUndertest.handlers.newDoclet({
-          doclet,
-        });
-        expect(doclet).toEqual(jasmine.objectContaining({
-          category: expectedCategory,
-        }));
+        systemUndertest.handlers.newDoclet({ doclet, });
+        expect(doclet).toEqual(jasmine.objectContaining({ category: expectedCategory, }));
       });
 
       it('creates a property "categorycolor" with configured value.', () => {
@@ -90,37 +69,12 @@ describe('KisJsdocPlugin', () => {
           kind: 'module',
           description: 'module',
           category: 'cat1',
-          meta: {
-            path: 'path',
-            filename: 'filename',
-          },
+          meta: { path: 'path', filename: 'filename', },
         };
-        systemUndertest.handlers.newDoclet({
-          doclet,
-        });
-        expect(doclet).toEqual(jasmine.objectContaining({
-          categorycolor: expectedColor,
-        }));
+        systemUndertest.handlers.newDoclet({ doclet, });
+        expect(doclet).toEqual(jasmine.objectContaining({ categorycolor: expectedColor, }));
       });
 
-      it('creates a property "categorycolor" with default value "blue" if not configured.', () => {
-        const expectedColor = 'blue';
-        const doclet = {
-          kind: 'module',
-          description: 'module',
-          category: 'catundefined',
-          meta: {
-            path: 'path',
-            filename: 'filename',
-          },
-        };
-        systemUndertest.handlers.newDoclet({
-          doclet,
-        });
-        expect(doclet).toEqual(jasmine.objectContaining({
-          categorycolor: expectedColor,
-        }));
-      });
     });
   });
 });
