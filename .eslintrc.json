@@ -2,11 +2,13 @@
   "root": true,
   "env": {
     "node": true,
+    "es6": true,
     "jasmine": true
   },
   "parserOptions": {
     "ecmaVersion": 2018
   },
+  "plugins": ["jasmine"],
   "extends": "airbnb-base",
   "rules": {
     "max-len": [

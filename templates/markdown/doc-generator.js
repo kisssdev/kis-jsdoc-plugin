@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /**
  * Defines a markdown document generator that uses handlebars templates.
  * @module
@@ -6,8 +7,9 @@
 const fs = require('fs-extra');
 const path = require('path');
 const Handlebars = require('handlebars');
-/* eslint-disable import/no-unresolved */
+// eslint-disable-next-line import/no-unresolved
 const logger = require('jsdoc/util/logger');
+// eslint-disable-next-line import/no-unresolved
 const env = require('jsdoc/env');
 
 /**
@@ -50,11 +52,10 @@ const accessSorter = (d1, d2) => order[d1.access] - order[d2.access];
  * let res = toDictionary([{n:'a', v:1}, {n:'b', v:2}], o => o.n);
  * // res is {a: {n:'a', v:1}, b: {n:'b', v:2} }
  */
-const toDictionary = (arr, keyGenerator, valueGenerator = item => item) =>
-  arr.reduce((acc, item, index) => {
-    acc[keyGenerator(item, index)] = valueGenerator(item, index);
-    return acc;
-  }, {});
+const toDictionary = (arr, keyGenerator, valueGenerator = item => item) => arr.reduce((acc, item, index) => {
+  acc[keyGenerator(item, index)] = valueGenerator(item, index);
+  return acc;
+}, {});
 
 /**
  * Converts an array of object to an object containing arrays.
@@ -70,13 +71,12 @@ const toDictionary = (arr, keyGenerator, valueGenerator = item => item) =>
  * let res = keyBy([{n:'a', v:1}, {n:'b', v:2}, {n:'a', v:3}], o => o.n);
  * // res is {a: [{n:'a', v:1}, {n:'a', v:3}], b: [{n:'b', v:2}] }
  */
-const keyBy = (arr, keySelector, valueSelector = item => item) =>
-  arr.reduce((acc, item) => {
-    const valuesArray = acc[keySelector(item)] || [];
-    valuesArray.push(valueSelector(item));
-    acc[keySelector(item)] = valuesArray;
-    return acc;
-  }, {});
+const keyBy = (arr, keySelector, valueSelector = item => item) => arr.reduce((acc, item) => {
+  const valuesArray = acc[keySelector(item)] || [];
+  valuesArray.push(valueSelector(item));
+  acc[keySelector(item)] = valuesArray;
+  return acc;
+}, {});
 
 /**
  * Transforms {\@link MyClass} or {\@link url|A text} inline tags within the specified JSDoc doclet
@@ -86,14 +86,13 @@ const keyBy = (arr, keySelector, valueSelector = item => item) =>
  */
 function generateLinks(doclet, typesIndex) {
   const regexp = /\{@link\s+([^|\s]+)(|[^{]+)?\}/gi; // capture only {@link namepathOrURL} or {@link namepathOrURL|link text}
-  const transformLinks = s =>
-    (regexp.test(s)
-      ? s.replace(regexp, (str, p1, p2) => {
-        const label = !p2 ? p1 : p2.substring(1);
-        const link = typesIndex[p1] || p1;
-        return `[${label}](${link})`;
-      })
-      : s);
+  const transformLinks = s => (regexp.test(s)
+    ? s.replace(regexp, (str, p1, p2) => {
+      const label = !p2 ? p1 : p2.substring(1);
+      const link = typesIndex[p1] || p1;
+      return `[${label}](${link})`;
+    })
+    : s);
   /* eslint-disable no-param-reassign */
   ['classdesc', 'description', 'tocDescription'].forEach((s) => {
     doclet[s] = transformLinks(doclet[s]);

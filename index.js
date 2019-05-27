@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /**
  * Defines a JSDoc plugin that adds custom properties to doclets and provides a new category tag.
  * @module
@@ -7,7 +8,7 @@
 const path = require('path');
 const fs = require('fs');
 const lineColumn = require('line-column');
-/* eslint-disable import/no-unresolved */
+// eslint-disable-next-line import/no-unresolved
 const env = require('jsdoc/env');
 
 const exportedClasses = [];
@@ -62,8 +63,8 @@ const config = {
     .toLowerCase()
     .replace(' ', '')
     .split(','),
-  badgecolors: (env.conf && env.conf.templates
-    && env.conf.templates.markdown && env.conf.templates.markdown.badgecolors) || {},
+  badgecolors:
+    (env.conf && env.conf.templates && env.conf.templates.markdown && env.conf.templates.markdown.badgecolors) || {},
 };
 
 /**
@@ -77,9 +78,10 @@ const config = {
 const processConfig = {
   isExportedClass: {
     // new 'isExportedClass' property that indicates if the class is exported
-    condition: d =>
-      d.kind === 'class' && d.meta.code && d.meta.code.name &&
-      (d.meta.code.name.startsWith('export') || (d.tags && d.tags.some(t => t.title === 'export'))),
+    condition: d => d.kind === 'class'
+      && d.meta.code
+      && d.meta.code.name
+      && (d.meta.code.name.startsWith('export') || (d.tags && d.tags.some(t => t.title === 'export'))),
     process: d => exportedClasses.push(d.name),
   },
   tocDescription: {
@@ -152,9 +154,13 @@ const processConfig = {
     condition: d => !d.access,
     value: (d) => {
       if (d.memberof && exportedClasses.includes(d.memberof) && d.name.charAt(0) !== '_') return 'public';
-      if ((d.kind === 'constant' || d.kind === 'function' || d.kind === 'member') &&
-        (d.meta.code && d.meta.code.name && d.meta.code.name.length > 0 &&
-          (d.meta.code.name.startsWith('exports.') || d.meta.code.name === 'module.exports'))) return 'public';
+      if (
+        (d.kind === 'constant' || d.kind === 'function' || d.kind === 'member')
+        && (d.meta.code
+          && d.meta.code.name
+          && d.meta.code.name.length > 0
+          && (d.meta.code.name.startsWith('exports.') || d.meta.code.name === 'module.exports'))
+      ) { return 'public'; }
       return 'private';
     },
   },
@@ -170,11 +176,17 @@ const processConfig = {
   isDefault: {
     // new 'isDefault' property that indicates if the documented object is the default export of the module
     condition: d => d.kind !== 'module' && d.name && d.name.startsWith('module:'),
-    process: (d) => { d.isDefault = true; d.name = 'default'; },
+    process: (d) => {
+      d.isDefault = true;
+      d.name = 'default';
+    },
   },
   inject: {
     // new 'inject' property that indicates if the documented object is decorated with the @inject decorator
-    condition: d => d.kind === 'class' && d.meta.code && d.meta.code.node && d.meta.code.node.decorators
+    condition: d => d.kind === 'class'
+      && d.meta.code
+      && d.meta.code.node
+      && d.meta.code.node.decorators
       && d.meta.code.node.decorators.length > 0,
     value: d => d.meta.code.node.decorators
       .map((dec) => {
@@ -191,10 +203,9 @@ const processConfig = {
  * Processes the specified doclet to add or modify properties based on the processConfig object.
  * @param {Doclet} doclet - the specified doclet
  */
-const processDoclet = doclet =>
-  Object.keys(processConfig)
-    .filter(k => processConfig[k].condition === undefined || processConfig[k].condition(doclet))
-    .forEach(k => (processConfig[k].process || defaultProcess(processConfig[k], k))(doclet));
+const processDoclet = doclet => Object.keys(processConfig)
+  .filter(k => processConfig[k].condition === undefined || processConfig[k].condition(doclet))
+  .forEach(k => (processConfig[k].process || defaultProcess(processConfig[k], k))(doclet));
 
 /**
  * Processes the parsed doclets to provide a better hierarchy.
@@ -205,7 +216,8 @@ const processDoclets = (doclets) => {
   const documentedFiles = new Set(doclets.filter(d => !d.undocumented).map(d => getFilePath(d)));
   // 2: js files documented as @module
   const documentedAsModuleFiles = new Set(doclets
-    .filter(d => d.kind === 'module' && !d.undocumented).map(d => getFilePath(d)));
+    .filter(d => d.kind === 'module' && !d.undocumented)
+    .map(d => getFilePath(d)));
   // define the (1-2) remaining files that will now be documented through new 'parent' module doclets
   const toDocumentAsModuleFiles = [...documentedFiles].filter(x => !documentedAsModuleFiles.has(x));
   // retrieve documented global class and functions and configure memberof so that they will be attached

@@ -4,6 +4,7 @@
   "description": "A jsdoc plugin associated with a custom template that generates markdown documentation in a 'Keep It Simple' way.",
   "main": "index.js",
   "scripts": {
+    "lint": "./node_modules/.bin/eslint ./index.js ./templates/**/*.js",
     "test": "./node_modules/.bin/jasmine",
     "doc": "./node_modules/.bin/jsdoc -c ./.jsdoc.json"
   },
@@ -30,8 +31,9 @@
   },
   "devDependencies": {
     "eslint": "^5.16.0",
-    "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.8.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jasmine": "^2.10.1",
     "jasmine": "^2.8.0",
     "jasmine-spec-reporter": "^4.2.1",
     "jsdoc": "^3.6.2",
