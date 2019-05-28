@@ -1,3 +1,7 @@
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![npm package](https://badge.fury.io/js/kis-jsdoc-plugin.svg)](https://www.npmjs.com/package/kis-jsdoc-plugin)
+[![Build Status](https://travis-ci.com/kisssdev/kis-jsdoc-plugin.svg?branch=master)](https://travis-ci.com/kisssdev/kis-jsdoc-plugin)
+
 # kis-jsdoc-plugin
 
 A [JSDoc](http://usejsdoc.org/index.html) plugin associated with a custom template that generates markdown documentation in a 'Keep It Simple' way.
