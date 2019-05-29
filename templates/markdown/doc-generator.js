@@ -242,7 +242,7 @@ function initHandlebars(typesIndex) {
   });
   const options = { imageext: config.imageext };
   Handlebars.registerHelper('link',
-    item => (typesIndex[item.toLowerCase()] ? `[${item}](${typesIndex[item.toLowerCase()]})` : `\`${item}\``));
+    item => (item && typesIndex[item.toLowerCase()] ? `[${item}](${typesIndex[item.toLowerCase()]})` : `\`${item}\``));
   Handlebars.registerHelper('options', context => options[context]);
   return compileTemplates();
 }
