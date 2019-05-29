@@ -40,5 +40,10 @@
     "jsdoc-escape-at": "^1.0.1",
     "kis-jsdoc-plugin": "^1.1.0",
     "mock-require": "^3.0.1"
-  }
+  },
+  "files":[
+    "index.js",
+    "templates",
+    "LICENSE"
+  ]
 }
