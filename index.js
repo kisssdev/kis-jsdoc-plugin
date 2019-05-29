@@ -212,7 +212,8 @@ const processDoclets = (doclets) => {
   // to their new 'parent' module doclets
   const classDoclets = doclets.filter(d => d.kind === 'class' && d.scope === 'global' && !d.undocumented);
   classDoclets.forEach((d) => {
-    d.memberof = `module:${d.name}`;
+    const moduleName = getModuleName(d.meta.filename, d.meta.path);
+    d.memberof = `module:${moduleName}`;
   });
   const functionsDoclets = doclets.filter(d => d.kind === 'function' && d.scope === 'global' && !d.undocumented);
   functionsDoclets.forEach((d) => {

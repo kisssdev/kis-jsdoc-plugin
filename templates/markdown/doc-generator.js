@@ -254,7 +254,8 @@ function initHandlebars(typesIndex) {
 exports.generateDoc = (rootNode) => {
   // generate an index of the class type <-> doc file
   const classes = (rootNode.modules || []).filter(m => m.classes !== undefined).map(m => m.classes).flat() || [];
-  const typesIndex = toDictionary(classes, d => d.name, d => defineDocfilename(d));
+  const all = classes.concat(rootNode.modules);
+  const typesIndex = toDictionary(all, d => d.name, d => defineDocfilename(d));
   Object.entries(config.externallinks).forEach(([key, value]) => {
     typesIndex[key] = value;
   });
