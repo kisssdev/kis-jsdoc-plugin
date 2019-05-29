@@ -5,6 +5,7 @@
 {{#each this}}
 * ![category:{{name}}](https://img.shields.io/badge/category-{{name}}-{{color}}.svg?style=flat-square)
     {{#each entries}}
-  * {{#link name}}{{/link}} - _{{tocDescription}}_
+  * {{#link tocName}}{{/link}} - _{{tocDescription}}_
     {{/each}}
+
 {{/each}}
