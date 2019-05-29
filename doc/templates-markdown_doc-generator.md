@@ -1,4 +1,4 @@
-# Module `DocGenerator`
+# Module `templates/markdown/doc-generator`
 
 ![category:core](https://img.shields.io/badge/category-core-9f9f9f.svg?style=flat-square)
 

@@ -1,4 +1,4 @@
-# Module `KisJsdocPlugin`
+# Module `index`
 
 ![category:jsdocplugin](https://img.shields.io/badge/category-jsdocplugin-009663.svg?style=flat-square)
 
@@ -134,8 +134,8 @@ The configuration of the JSDoc plugin.
     .toLowerCase()
     .replace(' ', '')
     .split(','),
-  badgecolors: (env.conf && env.conf.templates
-    && env.conf.templates.markdown && env.conf.templates.markdown.badgecolors) || {},
+  badgecolors:
+    (env.conf && env.conf.templates && env.conf.templates.markdown && env.conf.templates.markdown.badgecolors) || {},
 }
 ```
 
@@ -154,9 +154,10 @@ Each key of the configuration object defines a process:
 #### Value
 
 ```javascript
-
-      d.kind === 'class' && d.meta.code && d.meta.code.name &&
-      (d.meta.code.name.startsWith('export') || (d.tags && d.tags.some(t => t.title === 'export'))),
+ d.kind === 'class'
+      && d.meta.code
+      && d.meta.code.name
+      && (d.meta.code.name.startsWith('export') || (d.tags && d.tags.some(t => t.title === 'export'))),
     process: d => exportedClasses.push(d.name),
   },
   tocDescription: {
@@ -229,9 +230,13 @@ Each key of the configuration object defines a process:
     condition: d => !d.access,
     value: (d) => {
       if (d.memberof && exportedClasses.includes(d.memberof) && d.name.charAt(0) !== '_') return 'public';
-      if ((d.kind === 'constant' || d.kind === 'function' || d.kind === 'member') &&
-        (d.meta.code && d.meta.code.name && d.meta.code.name.length > 0 &&
-          (d.meta.code.name.startsWith('exports.') || d.meta.code.name === 'module.exports'))) return 'public';
+      if (
+        (d.kind === 'constant' || d.kind === 'function' || d.kind === 'member')
+        && (d.meta.code
+          && d.meta.code.name
+          && d.meta.code.name.length > 0
+          && (d.meta.code.name.startsWith('exports.') || d.meta.code.name === 'module.exports'))
+      ) { return 'public'; }
       return 'private';
     },
   },
@@ -239,19 +244,20 @@ Each key of the configuration object defines a process:
     // new 'included' property that indicates if the comment is to be included in the doc
     value: d => ['module', 'class'].includes(d.kind) || config.includes.includes(d.access),
   },
-  name: {
-    // modify the 'name' property of a module to deal with index.js within a folder
-    condition: d => d.kind === 'module',
-    value: d => getModuleName(d.meta.filename, d.meta.path),
-  },
   isDefault: {
     // new 'isDefault' property that indicates if the documented object is the default export of the module
     condition: d => d.kind !== 'module' && d.name && d.name.startsWith('module:'),
-    process: (d) => { d.isDefault = true; d.name = 'default'; },
+    process: (d) => {
+      d.isDefault = true;
+      d.name = 'default';
+    },
   },
   inject: {
     // new 'inject' property that indicates if the documented object is decorated with the @inject decorator
-    condition: d => d.kind === 'class' && d.meta.code && d.meta.code.node && d.meta.code.node.decorators
+    condition: d => d.kind === 'class'
+      && d.meta.code
+      && d.meta.code.node
+      && d.meta.code.node.decorators
       && d.meta.code.node.decorators.length > 0,
     value: d => d.meta.code.node.decorators
       .map((dec) => {

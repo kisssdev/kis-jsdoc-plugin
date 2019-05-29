@@ -89,7 +89,7 @@ function generateLinks(doclet, typesIndex) {
   const transformLinks = s => (regexp.test(s)
     ? s.replace(regexp, (str, p1, p2) => {
       const label = !p2 ? p1 : p2.substring(1);
-      const link = typesIndex[p1.toLowerCase()] || p1;
+      const link = typesIndex[p1] || p1;
       return `[${label}](${link})`;
     })
     : s);
@@ -242,7 +242,7 @@ function initHandlebars(typesIndex) {
   });
   const options = { imageext: config.imageext };
   Handlebars.registerHelper('link',
-    item => (item && typesIndex[item.toLowerCase()] ? `[${item}](${typesIndex[item.toLowerCase()]})` : `\`${item}\``));
+    item => (item && typesIndex[item] ? `[${item}](${typesIndex[item]})` : `\`${item}\``));
   Handlebars.registerHelper('options', context => options[context]);
   return compileTemplates();
 }
@@ -253,9 +253,10 @@ function initHandlebars(typesIndex) {
  */
 exports.generateDoc = (rootNode) => {
   // generate an index of the class type <-> doc file
-  const typesIndex = toDictionary(rootNode.modules || [], d => d.name.toLowerCase(), d => defineDocfilename(d));
+  const classes = (rootNode.modules || []).filter(m => m.classes !== undefined).map(m => m.classes).flat() || [];
+  const typesIndex = toDictionary(classes, d => d.name, d => defineDocfilename(d));
   Object.entries(config.externallinks).forEach(([key, value]) => {
-    typesIndex[key.toLowerCase()] = value;
+    typesIndex[key] = value;
   });
   // create handlebars helpers and compile templates
   const templates = initHandlebars(typesIndex);

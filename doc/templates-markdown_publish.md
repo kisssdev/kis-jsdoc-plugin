@@ -1,4 +1,4 @@
-# Module `Publish`
+# Module `templates/markdown/publish`
 
 ![category:jsdoctemplate](https://img.shields.io/badge/category-jsdoctemplate-00A800.svg?style=flat-square)
 

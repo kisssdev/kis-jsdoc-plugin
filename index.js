@@ -32,16 +32,14 @@ const hyphenToPascal = s => s.replace(/(-|^)([a-z])/gi, (match, delimiter, hyphe
  * In case of index.js the folder name is used.
  * @param {string} filename - the given filename
  * @param {string} folderPath - the given folder path containing the file
- * @param {boolean} rename - should rename 'index' based on parent folder?
  * @returns {string} the module name
  */
-const getModuleName = (filename, folderPath, rename = true) => {
-  const shortname = path.basename(filename, path.extname(filename));
-  if (shortname !== 'index' || !rename) {
-    return hyphenToPascal(shortname);
-  }
-  const folder = folderPath.split(path.sep).slice(-1)[0];
-  return hyphenToPascal(folder);
+const getModuleName = (filename, folderPath) => {
+  let shortname = path.basename(filename, path.extname(filename));
+  let namespacePath = path.relative(config.rootFolder, folderPath).split(path.sep);
+  namespacePath.shift();
+  if (shortname !== 'index') namespacePath.push(shortname);
+  return namespacePath.join('/');
 };
 
 /**
@@ -168,11 +166,6 @@ const processConfig = {
   included: {
     // new 'included' property that indicates if the comment is to be included in the doc
     value: d => ['module', 'class'].includes(d.kind) || config.includes.includes(d.access),
-  },
-  tocName: {
-    // new 'tocName' property that represents the name of a module that appears in the toc
-    condition: d => d.kind === 'module',
-    value: d => getModuleName(d.meta.filename, d.meta.path, d.meta.filename === 'index.js' && d.name === 'index'),
   },
   isDefault: {
     // new 'isDefault' property that indicates if the documented object is the default export of the module

@@ -3,11 +3,12 @@
 ## Table of contents
 
 * ![category:jsdocplugin](https://img.shields.io/badge/category-jsdocplugin-009663.svg?style=flat-square)
-  * [KisJsdocPlugin](_index.md) - _Defines a JSDoc plugin that adds custom properties to doclets and provides a new category tag._
+  * `index` - _Defines a JSDoc plugin that adds custom properties to doclets and provides a new category tag._
 
 * ![category:jsdoctemplate](https://img.shields.io/badge/category-jsdoctemplate-00A800.svg?style=flat-square)
-  * [Publish](templates-markdown_publish.md) - _Defines a JSDoc template that creates a code tree based on the JSDoc doclets
+  * `templates/markdown/publish` - _Defines a JSDoc template that creates a code tree based on the JSDoc doclets
 and calls the docgenerator._
 
 * ![category:core](https://img.shields.io/badge/category-core-9f9f9f.svg?style=flat-square)
-  * [DocGenerator](templates-markdown_doc-generator.md) - _Defines a markdown document generator that uses handlebars templates._
+  * `templates/markdown/doc-generator` - _Defines a markdown document generator that uses handlebars templates._
+
