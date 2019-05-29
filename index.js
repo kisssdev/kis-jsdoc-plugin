@@ -11,6 +11,20 @@ const lineColumn = require('line-column');
 // eslint-disable-next-line import/no-unresolved
 const env = require('jsdoc/env');
 
+/**
+ * The configuration of the JSDoc plugin.
+ */
+const config = {
+  rootFolder: env.pwd,
+  docFolder: env.opts.destination,
+  includes: (env.opts.includes || 'public,protected,private')
+    .toLowerCase()
+    .replace(' ', '')
+    .split(','),
+  badgecolors:
+    (env.conf && env.conf.templates && env.conf.templates.markdown && env.conf.templates.markdown.badgecolors) || {},
+};
+
 const exportedClasses = [];
 
 /**
@@ -21,13 +35,6 @@ const exportedClasses = [];
 const getFilePath = d => path.join(d.meta.path, d.meta.filename);
 
 /**
- * Converts a Kebab cased string in a Pascal cased string.
- * @param {string} s - The string in Kebab casing to convert in Pascal casing.
- * @return {string} - The Pascal cased string.
- */
-const hyphenToPascal = s => s.replace(/(-|^)([a-z])/gi, (match, delimiter, hyphenated) => hyphenated.toUpperCase());
-
-/**
  * Get the module name corresponding to the given filename and path.
  * In case of index.js the folder name is used.
  * @param {string} filename - the given filename
@@ -35,8 +42,8 @@ const hyphenToPascal = s => s.replace(/(-|^)([a-z])/gi, (match, delimiter, hyphe
  * @returns {string} the module name
  */
 const getModuleName = (filename, folderPath) => {
-  let shortname = path.basename(filename, path.extname(filename));
-  let namespacePath = path.relative(config.rootFolder, folderPath).split(path.sep);
+  const shortname = path.basename(filename, path.extname(filename));
+  const namespacePath = path.relative(config.rootFolder, folderPath).split(path.sep);
   namespacePath.shift();
   if (shortname !== 'index') namespacePath.push(shortname);
   return namespacePath.join('/');
@@ -51,19 +58,6 @@ const getModuleName = (filename, folderPath) => {
 const defaultProcess = (cf, k) => (d) => {
   /* eslint-disable no-param-reassign */
   d[k] = cf.value(d);
-};
-
-/**
- * The configuration of the JSDoc plugin.
- */
-const config = {
-  docFolder: env.opts.destination,
-  includes: (env.opts.includes || 'public,protected,private')
-    .toLowerCase()
-    .replace(' ', '')
-    .split(','),
-  badgecolors:
-    (env.conf && env.conf.templates && env.conf.templates.markdown && env.conf.templates.markdown.badgecolors) || {},
 };
 
 /**
