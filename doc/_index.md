@@ -40,19 +40,6 @@ __*return*__ | `string` | *the absolute file path*
 
 ---
 
-### `hyphenToPascal(s) ► string`
-
-![modifier: private](images/badges/modifier-private.svg)
-
-Converts a Kebab cased string in a Pascal cased string.
-
-Parameters | Type | Description
---- | --- | ---
-__s__ | `string` | *The string in Kebab casing to convert in Pascal casing.*
-__*return*__ | `string` | *- The Pascal cased string.*
-
----
-
 ### `getModuleName(filename, folderPath) ► string`
 
 ![modifier: private](images/badges/modifier-private.svg)
@@ -129,6 +116,7 @@ The configuration of the JSDoc plugin.
 
 ```javascript
 {
+  rootFolder: env.pwd,
   docFolder: env.opts.destination,
   includes: (env.opts.includes || 'public,protected,private')
     .toLowerCase()
