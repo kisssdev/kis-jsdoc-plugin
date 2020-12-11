@@ -6,7 +6,9 @@
   "scripts": {
     "lint": "./node_modules/.bin/eslint ./index.js ./templates/**/*.js",
     "test": "./node_modules/.bin/jasmine",
-    "doc": "./node_modules/.bin/jsdoc -c ./.jsdoc.json"
+    "doc": "./node_modules/.bin/jsdoc -c ./.jsdoc.json",
+    "upgrade": "npm-upgrade",
+    "release": "release-it"
   },
   "repository": {
     "type": "git",
@@ -24,22 +26,24 @@
   },
   "homepage": "https://github.com/kisssdev/kis-jsdoc-plugin#readme",
   "dependencies": {
-    "fs-extra": "^5.0.0",
+    "fs-extra": "^9.0.1",
     "handlebars": "^4.7.6",
     "line-column": "^1.0.2",
-    "shortid": "^2.2.15"
+    "shortid": "^2.2.16"
   },
   "devDependencies": {
-    "eslint": "^5.16.0",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-jasmine": "^2.10.1",
-    "jasmine": "^2.8.0",
-    "jasmine-spec-reporter": "^4.2.1",
-    "jsdoc": "^3.6.5",
+    "eslint": "^7.15.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jasmine": "^4.1.1",
+    "jasmine": "^3.6.3",
+    "jasmine-spec-reporter": "^6.0.0",
+    "jsdoc": "^3.6.6",
     "jsdoc-escape-at": "^1.0.1",
-    "kis-jsdoc-plugin": "^1.4.4",
-    "mock-require": "^3.0.3"
+    "kis-jsdoc-plugin": "^1.4.6",
+    "mock-require": "^3.0.3",
+    "npm-upgrade": "^2.0.4",
+    "release-it": "^14.2.2"
   },
   "files": [
     "index.js",
