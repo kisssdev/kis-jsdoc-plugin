@@ -26,24 +26,24 @@
   },
   "homepage": "https://github.com/kisssdev/kis-jsdoc-plugin#readme",
   "dependencies": {
-    "fs-extra": "^9.0.1",
-    "handlebars": "^4.7.6",
+    "fs-extra": "^9.1.0",
+    "handlebars": "^4.7.7",
     "line-column": "^1.0.2",
     "shortid": "^2.2.16"
   },
   "devDependencies": {
-    "eslint": "^7.15.0",
+    "eslint": "^7.22.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-jasmine": "^4.1.1",
-    "jasmine": "^3.6.3",
+    "eslint-plugin-jasmine": "^4.1.2",
+    "jasmine": "^3.7.0",
     "jasmine-spec-reporter": "^6.0.0",
     "jsdoc": "^3.6.6",
     "jsdoc-escape-at": "^1.0.1",
-    "kis-jsdoc-plugin": "^1.4.6",
+    "kis-jsdoc-plugin": "^1.4.7",
     "mock-require": "^3.0.3",
-    "npm-upgrade": "^2.0.4",
-    "release-it": "^14.2.2"
+    "npm-upgrade": "^3.0.0",
+    "release-it": "^14.5.0"
   },
   "files": [
     "index.js",

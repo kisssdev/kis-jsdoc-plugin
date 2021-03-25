@@ -52,8 +52,8 @@ function attachToParent(doclet, parentNode, doclets) {
  */
 function buildTree(parentNode, doclets, parentLongname) {
   doclets
-    .filter(doclet => doclet.memberof === parentLongname)
-    .forEach(doclet => attachToParent(doclet, parentNode, doclets));
+    .filter((doclet) => doclet.memberof === parentLongname)
+    .forEach((doclet) => attachToParent(doclet, parentNode, doclets));
 }
 
 /**

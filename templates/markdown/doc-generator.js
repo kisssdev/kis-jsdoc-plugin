@@ -52,7 +52,7 @@ const accessSorter = (d1, d2) => order[d1.access] - order[d2.access];
  * let res = toDictionary([{n:'a', v:1}, {n:'b', v:2}], o => o.n);
  * // res is {a: {n:'a', v:1}, b: {n:'b', v:2} }
  */
-const toDictionary = (array, keyGenerator, valueGenerator = item => item) => array.reduce((acc, item, index) => {
+const toDictionary = (array, keyGenerator, valueGenerator = (item) => item) => array.reduce((acc, item, index) => {
   acc[keyGenerator(item, index)] = valueGenerator(item, index);
   return acc;
 }, {});
@@ -71,7 +71,7 @@ const toDictionary = (array, keyGenerator, valueGenerator = item => item) => arr
  * let res = keyBy([{n:'a', v:1}, {n:'b', v:2}, {n:'a', v:3}], o => o.n);
  * // res is {a: [{n:'a', v:1}, {n:'a', v:3}], b: [{n:'b', v:2}] }
  */
-const keyBy = (array, keySelector, valueSelector = item => item) => array.reduce((acc, item) => {
+const keyBy = (array, keySelector, valueSelector = (item) => item) => array.reduce((acc, item) => {
   const valuesArray = acc[keySelector(item)] || [];
   valuesArray.push(valueSelector(item));
   acc[keySelector(item)] = valuesArray;
@@ -86,7 +86,7 @@ const keyBy = (array, keySelector, valueSelector = item => item) => array.reduce
  */
 function generateLinks(doclet, typesIndex) {
   const regexp = /\{@link\s+([^|\s]+)(|[^{]+)?\}/gi; // capture only {@link namepathOrURL} or {@link namepathOrURL|link text}
-  const transformLinks = s => (regexp.test(s)
+  const transformLinks = (s) => (regexp.test(s)
     ? s.replace(regexp, (string, p1, p2) => {
       const label = !p2 ? p1 : p2.substring(1);
       const link = typesIndex[p1] || p1;
@@ -107,11 +107,11 @@ function generateLinks(doclet, typesIndex) {
  */
 function generateLinksRecursively(doclet, typesIndex) {
   generateLinks(doclet, typesIndex);
-  if (doclet.classes) doclet.classes.forEach(c => generateLinksRecursively(c, typesIndex));
-  if (doclet.functions) doclet.functions.forEach(c => generateLinksRecursively(c, typesIndex));
-  if (doclet.constants) doclet.constants.forEach(c => generateLinksRecursively(c, typesIndex));
-  if (doclet.parameters) doclet.parameters.forEach(c => generateLinks(c, typesIndex));
-  if (doclet.returns) doclet.returns.forEach(c => generateLinks(c, typesIndex));
+  if (doclet.classes) doclet.classes.forEach((c) => generateLinksRecursively(c, typesIndex));
+  if (doclet.functions) doclet.functions.forEach((c) => generateLinksRecursively(c, typesIndex));
+  if (doclet.constants) doclet.constants.forEach((c) => generateLinksRecursively(c, typesIndex));
+  if (doclet.parameters) doclet.parameters.forEach((c) => generateLinks(c, typesIndex));
+  if (doclet.returns) doclet.returns.forEach((c) => generateLinks(c, typesIndex));
 }
 
 /**
@@ -122,7 +122,7 @@ function generateLinksRecursively(doclet, typesIndex) {
 function compileTemplatesInFolder(folder, registerAsPartial = false) {
   const templates = {};
   fs.readdirSync(folder, { encoding: config.encoding, withFileTypes: true })
-    .filter(d => !d.isDirectory())
+    .filter((d) => !d.isDirectory())
     .forEach((f) => {
       try {
         const templateName = path.basename(f.name, path.extname(f.name));
@@ -216,12 +216,12 @@ function generateDocument(doclet, template, typesIndex) {
  */
 function generateToc(rootNode, template) {
   if (!rootNode.modules) return;
-  const documentByCategory = keyBy([...rootNode.modules || []], d => d.category);
+  const documentByCategory = keyBy([...rootNode.modules || []], (d) => d.category);
   const colorByCategory = config.badgecolors;
   const tocSorter = (c1, c2) => config.tocOrder[c1] - config.tocOrder[c2];
   const toc = Object.keys(documentByCategory)
     .sort(tocSorter)
-    .map(cat => ({
+    .map((cat) => ({
       name: cat,
       entries: documentByCategory[cat],
       color: colorByCategory[cat] || 'blue',
@@ -247,18 +247,18 @@ function copyResources() {
 function initHandlebars(typesIndex) {
   Handlebars.registerHelper('join', (context, options) => {
     const property = options.hash.on;
-    const target = p => (property ? p[property] : p);
+    const target = (p) => (property ? p[property] : p);
     return context
       ? context
-        .map(p => target(p))
-        .filter(p => !p.includes('.'))
+        .map((p) => target(p))
+        .filter((p) => !p.includes('.'))
         .join(', ')
       : '';
   });
   const options = { imageext: config.imageext };
   Handlebars.registerHelper('link',
-    item => (item && typesIndex[item] ? `[${item}](${typesIndex[item]})` : `\`${item}\``));
-  Handlebars.registerHelper('options', context => options[context]);
+    (item) => (item && typesIndex[item] ? `[${item}](${typesIndex[item]})` : `\`${item}\``));
+  Handlebars.registerHelper('options', (context) => options[context]);
   return compileTemplates();
 }
 
@@ -268,16 +268,16 @@ function initHandlebars(typesIndex) {
  */
 exports.generateDoc = (rootNode) => {
   // generate an index of the class type <-> doc file
-  const classes = (rootNode.modules || []).filter(m => m.classes !== undefined).flatMap(m => m.classes) || [];
-  const all = classes.concat(rootNode.modules).filter(d => d != null && d.name && d.name.length > 0);
-  const typesIndex = toDictionary(all, d => d.name, d => defineDocfilename(d));
+  const classes = (rootNode.modules || []).filter((m) => m.classes !== undefined).flatMap((m) => m.classes) || [];
+  const all = classes.concat(rootNode.modules).filter((d) => d != null && d.name && d.name.length > 0);
+  const typesIndex = toDictionary(all, (d) => d.name, (d) => defineDocfilename(d));
   Object.entries(config.externallinks).forEach(([key, value]) => {
     typesIndex[key] = value;
   });
   // create handlebars helpers and compile templates
   const templates = initHandlebars(typesIndex);
   // generate doc file for each modules
-  if (rootNode.modules) rootNode.modules.forEach(d => generateDocument(d, templates.module, typesIndex));
+  if (rootNode.modules) rootNode.modules.forEach((d) => generateDocument(d, templates.module, typesIndex));
   // generate the TOC
   generateToc(rootNode, templates.toc);
   // copy the resources

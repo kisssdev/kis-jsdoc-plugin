@@ -32,7 +32,7 @@ const exportedClasses = [];
  * @param {Doclet} d - the specified doclet
  * @returns {string} the absolute file path
  */
-const getFilePath = d => path.join(d.meta.path, d.meta.filename);
+const getFilePath = (d) => path.join(d.meta.path, d.meta.filename);
 
 /**
  * Get the module name corresponding to the given filename and path.
@@ -71,20 +71,20 @@ const defaultProcess = (cf, k) => (d) => {
 const processConfig = {
   isExportedClass: {
     // new 'isExportedClass' property that indicates if the class is exported
-    condition: d => d.kind === 'class'
+    condition: (d) => d.kind === 'class'
       && d.meta.code
       && d.meta.code.name
-      && (d.meta.code.name.startsWith('export') || (d.tags && d.tags.some(t => t.title === 'export'))),
-    process: d => exportedClasses.push(d.name),
+      && (d.meta.code.name.startsWith('export') || (d.tags && d.tags.some((t) => t.title === 'export'))),
+    process: (d) => exportedClasses.push(d.name),
   },
   tocDescription: {
     // new 'tocDescription' property that represents the description of a module that appears in the toc
-    condition: d => d.kind === 'module' && !d.tocDescription,
-    value: d => d.description,
+    condition: (d) => d.kind === 'module' && !d.tocDescription,
+    value: (d) => d.description,
   },
   valuecode: {
     // new 'valuecode' property that represents the source code of a constant
-    condition: d => d.kind === 'constant',
+    condition: (d) => d.kind === 'constant',
     value: (d) => {
       const sourcefile = getFilePath(d);
       const source = fs.readFileSync(sourcefile, 'utf8');
@@ -106,24 +106,24 @@ const processConfig = {
       const filepath = path.join(config.docFolder, 'images/screenshots', filename);
       return fs.existsSync(filepath);
     },
-    value: d => `${d.kind}_${path.basename(d.meta.filename, path.extname(d.meta.filename))}.png`,
+    value: (d) => `${d.kind}_${path.basename(d.meta.filename, path.extname(d.meta.filename))}.png`,
   },
   category: {
     // modify the 'category' property: add a default value ('other') if none found
-    condition: d => !d.category && ['module', 'class'].includes(d.kind),
+    condition: (d) => !d.category && ['module', 'class'].includes(d.kind),
     value: () => 'other',
   },
   categorycolor: {
     // new 'categorycolor' property
-    value: d => config.badgecolors[d.category] || 'blue',
+    value: (d) => config.badgecolors[d.category] || 'blue',
   },
   static: {
     // new 'relativepath' property that indicates if the documented object is static?
-    value: d => d.scope === 'static',
+    value: (d) => d.scope === 'static',
   },
   hasParameters: {
     // new 'hasParameters' property that indicates if the documented object has @param or @return tags?
-    value: d => (d.params && d.params.length > 0) || (d.returns && d.returns.length > 0),
+    value: (d) => (d.params && d.params.length > 0) || (d.returns && d.returns.length > 0),
   },
   relativepath: {
     // new 'relativepath' property that indicates the relative path from the documentation to the source code
@@ -134,17 +134,17 @@ const processConfig = {
   },
   type: {
     // new 'type' property that indicates the type of a member
-    condition: d => d.kind === 'member' && d.returns && d.returns.length > 0,
-    value: d => d.returns[0].type,
+    condition: (d) => d.kind === 'member' && d.returns && d.returns.length > 0,
+    value: (d) => d.returns[0].type,
   },
   memberof: {
     // modify the 'memberof' property: fix 'export default var'
-    condition: d => d.kind !== 'module' && !d.memberof && d.longname && d.longname.startsWith('module:'),
-    value: d => d.longname,
+    condition: (d) => d.kind !== 'module' && !d.memberof && d.longname && d.longname.startsWith('module:'),
+    value: (d) => d.longname,
   },
   access: {
     // modify the 'access' property: add a default value ('private') if none found
-    condition: d => !d.access,
+    condition: (d) => !d.access,
     value: (d) => {
       if (d.memberof && exportedClasses.includes(d.memberof) && d.name.charAt(0) !== '_') return 'public';
       if (
@@ -159,11 +159,11 @@ const processConfig = {
   },
   included: {
     // new 'included' property that indicates if the comment is to be included in the doc
-    value: d => ['module', 'class'].includes(d.kind) || config.includes.includes(d.access),
+    value: (d) => ['module', 'class'].includes(d.kind) || config.includes.includes(d.access),
   },
   isDefault: {
     // new 'isDefault' property that indicates if the documented object is the default export of the module
-    condition: d => d.kind !== 'module' && d.name && d.name.startsWith('module:'),
+    condition: (d) => d.kind !== 'module' && d.name && d.name.startsWith('module:'),
     process: (d) => {
       d.isDefault = true;
       d.name = 'default';
@@ -171,12 +171,12 @@ const processConfig = {
   },
   inject: {
     // new 'inject' property that indicates if the documented object is decorated with the @inject decorator
-    condition: d => d.kind === 'class'
+    condition: (d) => d.kind === 'class'
       && d.meta.code
       && d.meta.code.node
       && d.meta.code.node.decorators
       && d.meta.code.node.decorators.length > 0,
-    value: d => d.meta.code.node.decorators
+    value: (d) => d.meta.code.node.decorators
       .map((dec) => {
         let decoratorName = '';
         if (dec.expression.type === 'Identifier') decoratorName = dec.expression.name;
@@ -191,9 +191,9 @@ const processConfig = {
  * Processes the specified doclet to add or modify properties based on the processConfig object.
  * @param {Doclet} doclet - the specified doclet
  */
-const processDoclet = doclet => Object.keys(processConfig)
-  .filter(k => processConfig[k].condition === undefined || processConfig[k].condition(doclet))
-  .forEach(k => (processConfig[k].process || defaultProcess(processConfig[k], k))(doclet));
+const processDoclet = (doclet) => Object.keys(processConfig)
+  .filter((k) => processConfig[k].condition === undefined || processConfig[k].condition(doclet))
+  .forEach((k) => (processConfig[k].process || defaultProcess(processConfig[k], k))(doclet));
 
 /**
  * Processes the parsed doclets to provide a better hierarchy.
@@ -201,27 +201,27 @@ const processDoclet = doclet => Object.keys(processConfig)
  */
 const processDoclets = (doclets) => {
   // 1: all js files with comments
-  const documentedFiles = new Set(doclets.filter(d => !d.undocumented).map(d => getFilePath(d)));
+  const documentedFiles = new Set(doclets.filter((d) => !d.undocumented).map((d) => getFilePath(d)));
   // 2: js files documented as @module
   const documentedAsModuleFiles = new Set(doclets
-    .filter(d => d.kind === 'module' && !d.undocumented)
-    .map(d => getFilePath(d)));
+    .filter((d) => d.kind === 'module' && !d.undocumented)
+    .map((d) => getFilePath(d)));
   // define the (1-2) remaining files that will now be documented through new 'parent' module doclets
-  const toDocumentAsModuleFiles = [...documentedFiles].filter(x => !documentedAsModuleFiles.has(x));
+  const toDocumentAsModuleFiles = [...documentedFiles].filter((x) => !documentedAsModuleFiles.has(x));
   // retrieve documented global class and functions and configure memberof so that they will be attached
   // to their new 'parent' module doclets
-  const classDoclets = doclets.filter(d => d.kind === 'class' && d.scope === 'global' && !d.undocumented);
+  const classDoclets = doclets.filter((d) => d.kind === 'class' && d.scope === 'global' && !d.undocumented);
   classDoclets.forEach((d) => {
     const moduleName = getModuleName(d.meta.filename, d.meta.path);
     d.memberof = `module:${moduleName}`;
   });
-  const functionsDoclets = doclets.filter(d => d.kind === 'function' && d.scope === 'global' && !d.undocumented);
+  const functionsDoclets = doclets.filter((d) => d.kind === 'function' && d.scope === 'global' && !d.undocumented);
   functionsDoclets.forEach((d) => {
     const moduleName = getModuleName(d.meta.filename, d.meta.path);
     d.memberof = `module:${moduleName}`;
   });
   // class dictionary to copy some class properties to the new 'parent' module doclets
-  const documentedAsClassFiles = new Map(classDoclets.map(d => [getFilePath(d), d]));
+  const documentedAsClassFiles = new Map(classDoclets.map((d) => [getFilePath(d), d]));
   // the new parent module doclets to be created
   const modules = toDocumentAsModuleFiles.map((f) => {
     const classDoclet = documentedAsClassFiles.has(f) ? documentedAsClassFiles.get(f) : {};
@@ -240,7 +240,7 @@ const processDoclets = (doclets) => {
     processDoclet(doclet);
     return doclet;
   });
-  modules.forEach(m => doclets.push(m));
+  modules.forEach((m) => doclets.push(m));
 };
 
 /**
