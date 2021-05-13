@@ -90,8 +90,22 @@ let res = keyBy([{n:'a', v:1}, {n:'b', v:2}, {n:'a', v:3}], o => o.n);
 
 ![modifier: private](images/badges/modifier-private.svg)
 
-Transforms {@link MyClass} or {@link url|A text} inline tags within the specified JSDoc doclet
+Transforms [MyClass](MyClass) or [A text](url) inline tags within the specified JSDoc doclet
 to a markdown link to the associated type documentation.
+
+Parameters | Type | Description
+--- | --- | ---
+__doclet__ | `Doclet` | *The JSDoc doclet to transform.*
+__typesIndex__ | `Object.<string>` | *The types index - associating a type with its documentation file.*
+
+---
+
+### `generateLinksRecursively(doclet, typesIndex)`
+
+![modifier: private](images/badges/modifier-private.svg)
+
+Transforms [MyClass](MyClass) or [A text](url) inline tags within the specified JSDoc doclet
+and all of its descendants to a markdown link to the associated type documentation.
 
 Parameters | Type | Description
 --- | --- | ---
@@ -152,7 +166,7 @@ __docfilename__ | `string` | *The documentation file name.*
 
 ---
 
-### `generateDoc(doclet, template, typesIndex)`
+### `generateDocument(doclet, template, typesIndex)`
 
 ![modifier: private](images/badges/modifier-private.svg)
 
