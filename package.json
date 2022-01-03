@@ -1,6 +1,6 @@
 {
   "name": "kis-jsdoc-plugin",
-  "version": "1.4.9",
+  "version": "1.4.10",
   "description": "A jsdoc plugin associated with a custom template that generates markdown documentation in a 'Keep It Simple' way.",
   "main": "index.js",
   "scripts": {
