@@ -256,8 +256,10 @@ function initHandlebars(typesIndex) {
       : '';
   });
   const options = { imageext: config.imageext };
-  Handlebars.registerHelper('link',
-    (item) => (item && typesIndex[item] ? `[${item}](${typesIndex[item]})` : `\`${item}\``));
+  Handlebars.registerHelper(
+    'link',
+    (item) => (item && typesIndex[item] ? `[${item}](${typesIndex[item]})` : `\`${item}\``)
+  );
   Handlebars.registerHelper('options', (context) => options[context]);
   return compileTemplates();
 }
