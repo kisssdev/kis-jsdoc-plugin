@@ -70,7 +70,7 @@ const defaultProcess = (cf, k) => (d) => {
  */
 const processConfig = {
   isExportedClass: {
-    // new 'isExportedClass' property that indicates if the class is exported
+    // add 'isExportedClass' property that indicates if the class is exported
     condition: (d) => d.kind === 'class'
       && d.meta.code
       && d.meta.code.name
@@ -78,12 +78,12 @@ const processConfig = {
     process: (d) => exportedClasses.push(d.name),
   },
   tocDescription: {
-    // new 'tocDescription' property that represents the description of a module that appears in the toc
+    // add 'tocDescription' property that represents the description of a module that appears in the toc
     condition: (d) => d.kind === 'module' && !d.tocDescription,
     value: (d) => d.description,
   },
   valuecode: {
-    // new 'valuecode' property that represents the source code of a constant
+    // add 'valuecode' property that represents the source code of a constant
     condition: (d) => d.kind === 'constant',
     value: (d) => {
       const sourcefile = getFilePath(d);
@@ -98,7 +98,7 @@ const processConfig = {
     },
   },
   screenshot: {
-    // new 'screenshot' property that indicates if the documented has a related snapshot image?
+    // add 'screenshot' property that indicates if the documented has a related snapshot image?
     condition: (d) => {
       if (!['module', 'class'].includes(d.kind)) return false;
       // the relative path of the screenshot file
@@ -114,26 +114,26 @@ const processConfig = {
     value: () => 'other',
   },
   categorycolor: {
-    // new 'categorycolor' property
+    // add 'categorycolor' property
     value: (d) => config.badgecolors[d.category] || 'blue',
   },
   static: {
-    // new 'relativepath' property that indicates if the documented object is static?
+    // add 'relativepath' property that indicates if the documented object is static?
     value: (d) => d.scope === 'static',
   },
   hasParameters: {
-    // new 'hasParameters' property that indicates if the documented object has @param or @return tags?
+    // add 'hasParameters' property that indicates if the documented object has @param or @return tags?
     value: (d) => (d.params && d.params.length > 0) || (d.returns && d.returns.length > 0),
   },
   relativepath: {
-    // new 'relativepath' property that indicates the relative path from the documentation to the source code
+    // add 'relativepath' property that indicates the relative path from the documentation to the source code
     value: (d) => {
       const filepath = getFilePath(d); // the absolute path of the source file
       return path.relative(config.docFolder, filepath); // the relative path of the source file from the documentation folder
     },
   },
   type: {
-    // new 'type' property that indicates the type of a member
+    // add 'type' property that indicates the type of a member
     condition: (d) => d.kind === 'member' && d.returns && d.returns.length > 0,
     value: (d) => d.returns[0].type,
   },
@@ -158,32 +158,25 @@ const processConfig = {
     },
   },
   included: {
-    // new 'included' property that indicates if the comment is to be included in the doc
+    // add 'included' property that indicates if the comment is to be included in the doc
     value: (d) => ['module', 'class'].includes(d.kind) || config.includes.includes(d.access),
   },
   isDefault: {
-    // new 'isDefault' property that indicates if the documented object is the default export of the module
+    // add 'isDefault' property that indicates if the documented object is the default export of the module
     condition: (d) => d.kind !== 'module' && d.name && d.name.startsWith('module:'),
     process: (d) => {
       d.isDefault = true;
       d.name = 'default';
     },
   },
-  inject: {
-    // new 'inject' property that indicates if the documented object is decorated with the @inject decorator
-    condition: (d) => d.kind === 'class'
-      && d.meta.code
-      && d.meta.code.node
-      && d.meta.code.node.decorators
-      && d.meta.code.node.decorators.length > 0,
-    value: (d) => d.meta.code.node.decorators
-      .map((dec) => {
-        let decoratorName = '';
-        if (dec.expression.type === 'Identifier') decoratorName = dec.expression.name;
-        if (dec.expression.type === 'CallExpression') decoratorName = dec.expression.callee.name;
-        return decoratorName;
-      })
-      .includes('inject'),
+  fixUndocumented: {
+    // fix a jsdoc regression: constructors are forced to undocumented on some conditions
+    // so the publish handler has been modified to include also undocumented
+    // and truly undocumented doclets are marked as 'included': false so that they can be removed
+    condition: (d) => d.undocumented === true,
+    process: (d) => {
+      d.included = false;
+    },
   },
 };
 
