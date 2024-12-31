@@ -10,5 +10,5 @@
 and calls the docgenerator._
 
 * ![category:core](https://img.shields.io/badge/category-core-9f9f9f.svg?style=flat-square)
-  * [templates/markdown/doc-generator](templates-markdown_doc-generator.md) - _Defines a markdown document generator that uses handlebars templates._
+  * [templates/markdown/document-generator](templates-markdown_document-generator.md) - _Defines a markdown document generator that uses handlebars templates._
 

@@ -7,13 +7,13 @@
     "exclude": ["node_modules"]
   },
   "opts": {
-    "template": "node_modules/kis-jsdoc-plugin/templates/markdown",
+    "template": "./templates/markdown",
     "encoding": "utf8",
     "destination": "./doc/",
     "recurse": true,
     "includes": "public,private"
   },
-  "plugins": ["node_modules/jsdoc-escape-at", "node_modules/kis-jsdoc-plugin"],
+  "plugins": ["node_modules/jsdoc-escape-at", "./index.js"],
   "templates": {
     "markdown": {
       "tocfilename": "toc.md",

@@ -9,7 +9,7 @@ and calls the docgenerator.
 
 ## Functions
 
-### `publish(data, opts)`
+### `publish(data, options)`
 
 ![modifier: public](images/badges/modifier-public.svg) ![modifier: static](images/badges/modifier-static.svg)
 
@@ -17,8 +17,8 @@ Builds a tree of JSDoc doclet data and generates documentation.
 
 Parameters | Type | Description
 --- | --- | ---
-__data__ | `TAFFY` | *The database containing comments and tags.*
-__opts__ | `Object` | *The JSDoc options.*
+__data__ | `Salty` | *The database containing comments and tags.*
+__options__ | `Object` | *The JSDoc options.*
 
 ---
 
@@ -71,7 +71,7 @@ and if a recursive parsing is required to build this collection.
   function: { childrenCollection: 'functions', recurse: false },
   member: { childrenCollection: 'members', recurse: false },
   event: { childrenCollection: 'events', recurse: false },
-  constant: { childrenCollection: 'constants', recurse: false },
+  constant: { childrenCollection: 'constants', recurse: false }
 }
 ```
 

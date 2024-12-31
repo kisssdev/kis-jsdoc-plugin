@@ -1,14 +1,14 @@
-# Module `templates/markdown/doc-generator`
+# Module `templates/markdown/document-generator`
 
 ![category:core](https://img.shields.io/badge/category-core-9f9f9f.svg?style=flat-square)
 
 Defines a markdown document generator that uses handlebars templates.
 
-[Source file](..\templates\markdown\doc-generator.js)
+[Source file](..\templates\markdown\document-generator.js)
 
 ## Functions
 
-### `generateDoc(rootNode)`
+### `generateDoc(rootNode, _options)`
 
 ![modifier: public](images/badges/modifier-public.svg) ![modifier: static](images/badges/modifier-static.svg)
 
@@ -16,7 +16,8 @@ Generates the documentation.
 
 Parameters | Type | Description
 --- | --- | ---
-__rootNode__ | `Object` | *The documentation root node.*
+__rootNode__ | `Doclet` | *The documentation root node.*
+___options__ | `Record.<string, any>` | *The options.*
 
 ---
 
@@ -33,7 +34,7 @@ __d2__ | `Doclet` | *second doclet*
 
 ---
 
-### `toDictionary(arr, keyGenerator, valueGenerator) ► Object`
+### `toDictionary(array, keyGenerator, valueGenerator) ► Object`
 
 ![modifier: private](images/badges/modifier-private.svg)
 
@@ -41,7 +42,7 @@ Converts an array of object to a dictionary.
 
 Parameters | Type | Description
 --- | --- | ---
-__arr__ | `Array.<Object>` | *The array of objects to convert to dictionary.*
+__array__ | `Array.<Object>` | *The array of objects to convert to dictionary.*
 __keyGenerator__ | `function` | *The function used to define the key of the object added to the dictionary.*
 __valueGenerator__ | `function` | *The function used to define the value of the object added to the dictionary.*
 __*return*__ | `Object` | *The object acting as a dictionary.*
@@ -59,7 +60,7 @@ let res = toDictionary([{n:'a', v:1}, {n:'b', v:2}], o => o.n);
 
 ---
 
-### `keyBy(arr, keySelector, valueSelector) ► Object`
+### `keyBy(array, keySelector, valueSelector) ► Object`
 
 ![modifier: private](images/badges/modifier-private.svg)
 
@@ -68,7 +69,7 @@ The value produced by the specified keySelector is used to define the properties
 
 Parameters | Type | Description
 --- | --- | ---
-__arr__ | `Array.<Object>` | *The array of objects to convert to dictionary.*
+__array__ | `Array.<Object>` | *The array of objects to convert to dictionary.*
 __keySelector__ | `function` | *The function used to define the key.*
 __valueSelector__ | `function` | *The function used to define the value.*
 __*return*__ | `Object` | *The resulting object.*
@@ -96,7 +97,7 @@ to a markdown link to the associated type documentation.
 Parameters | Type | Description
 --- | --- | ---
 __doclet__ | `Doclet` | *The JSDoc doclet to transform.*
-__typesIndex__ | `Object.<string>` | *The types index - associating a type with its documentation file.*
+__typesIndex__ | `Record.<string, string>` | *The types index - associating a type with its documentation file.*
 
 ---
 
@@ -110,11 +111,11 @@ and all of its descendants to a markdown link to the associated type documentati
 Parameters | Type | Description
 --- | --- | ---
 __doclet__ | `Doclet` | *The JSDoc doclet to transform.*
-__typesIndex__ | `Object.<string>` | *The types index - associating a type with its documentation file.*
+__typesIndex__ | `Record.<string, string>` | *The types index - associating a type with its documentation file.*
 
 ---
 
-### `compileTemplatesInFolder() ► Object.<string>`
+### `compileTemplatesInFolder() ► Record.<string, any>`
 
 ![modifier: private](images/badges/modifier-private.svg)
 
@@ -123,11 +124,11 @@ If registerAsPartial is true, templates are only precompiled and no index is ret
 
 Parameters | Type | Description
 --- | --- | ---
-__*return*__ | `Object.<string>` | *The templates index - associating the name of the template with its handlebar compiled template.*
+__*return*__ | `Record.<string, any>` | *The templates index - associating the name of the template with its handlebar compiled template.*
 
 ---
 
-### `compileTemplates() ► Object.<string>`
+### `compileTemplates() ► Record.<string, any>`
 
 ![modifier: private](images/badges/modifier-private.svg)
 
@@ -135,7 +136,7 @@ Compiles the handlebars templates and defines a templates index.
 
 Parameters | Type | Description
 --- | --- | ---
-__*return*__ | `Object.<string>` | *The templates index - associating the name of the template with its handlebar compiled template.*
+__*return*__ | `Record.<string, any>` | *The templates index - associating the name of the template with its handlebar compiled template.*
 
 ---
 
@@ -161,7 +162,7 @@ Generates the documentation file of the given model and handlebars template.
 Parameters | Type | Description
 --- | --- | ---
 __model__ | `Object` | *The model to use for the handlebars template.*
-__template__ | `Template` | *The handlebars template.*
+__template__ | `Handlebars.TemplateDelegate` | *The handlebars template.*
 __docfilename__ | `string` | *The documentation file name.*
 
 ---
@@ -175,8 +176,8 @@ Generates the documentation for the given JSDoc doclet.
 Parameters | Type | Description
 --- | --- | ---
 __doclet__ | `Doclet` | *The JSDoc doclet for which the documentation will be generated.*
-__template__ | `Template` | *The handlebars template.*
-__typesIndex__ | `Object.<string>` | *The types index - associating a type with its documentation file.*
+__template__ | `Handlebars.TemplateDelegate` | *The handlebars template.*
+__typesIndex__ | `Record.<string, any>` | *The types index - associating a type with its documentation file.*
 
 ---
 
@@ -189,7 +190,7 @@ Generates the table of contents for the given documentation root node.
 Parameters | Type | Description
 --- | --- | ---
 __rootNode__ | `Object` | *The documentation root node for which the table of contents will be generated.*
-__template__ | `Template` | *The handlebars template.*
+__template__ | `Handlebars.TemplateDelegate` | *The handlebars template.*
 
 ---
 
@@ -201,7 +202,7 @@ Copies the resources - i.e. images or svg - to the final documentation folder.
 
 ---
 
-### `initHandlebars(typesIndex) ► Object.<string>`
+### `initHandlebars(typesIndex) ► Record.<string, any>`
 
 ![modifier: private](images/badges/modifier-private.svg)
 
@@ -209,8 +210,8 @@ Initializes handlebars, registers custom helpers and compilates templates.
 
 Parameters | Type | Description
 --- | --- | ---
-__typesIndex__ | `Object.<string>` | *The types index - associating a type with its documentation file.*
-__*return*__ | `Object.<string>` | *The templates index - associating the name of the template with its handlebar compiled template.*
+__typesIndex__ | `string` | *The types index - associating a type with its documentation file.*
+__*return*__ | `Record.<string, any>` | *The templates index - associating the name of the template with its handlebar compiled template.*
 
 ---
 
@@ -226,15 +227,19 @@ The configuration of the document generator.
 
 ```javascript
 {
-  imageext: (env.conf.templates && env.conf.templates.markdown && env.conf.templates.markdown.imageext) || 'svg',
+  imageext:
+    (env.conf.templates && env.conf.templates.markdown && env.conf.templates.markdown.imageext) || 'svg',
   docFolder: env.opts.destination,
   rootFolder: env.opts.template,
   encoding: env.opts.encoding,
   tocfilename:
-    (env.conf.templates && env.conf.templates.markdown && env.conf.templates.markdown.tocfilename) || 'toc.md',
+    (env.conf.templates && env.conf.templates.markdown && env.conf.templates.markdown.tocfilename) ||
+    'toc.md',
   tocOrder: (env.conf.templates && env.conf.templates.markdown && env.conf.templates.markdown.tocOrder) || {},
-  externallinks: (env.conf.templates && env.conf.templates.markdown && env.conf.templates.markdown.externallinks) || {},
-  badgecolors: (env.conf.templates && env.conf.templates.markdown && env.conf.templates.markdown.badgecolors) || {},
+  externallinks:
+    (env.conf.templates && env.conf.templates.markdown && env.conf.templates.markdown.externallinks) || {},
+  badgecolors:
+    (env.conf.templates && env.conf.templates.markdown && env.conf.templates.markdown.badgecolors) || {}
 }
 ```
 

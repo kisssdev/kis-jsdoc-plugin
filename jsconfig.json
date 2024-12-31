@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "checkJs": true,
+    "experimentalDecorators": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["**/*.js", "./types.d.ts"]
+}
