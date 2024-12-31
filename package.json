@@ -7,7 +7,6 @@
     "lint": "eslint ./index.js ./templates/**/*.js",
     "test": "jasmine",
     "doc": "jsdoc -c ./.jsdoc.json",
-    "upgrade": "npm-upgrade",
     "release": "release-it"
   },
   "repository": {
@@ -48,7 +47,6 @@
     "jsdoc": "^4.0.4",
     "jsdoc-escape-at": "^1.0.1",
     "mock-require": "^3.0.3",
-    "npm-upgrade": "^3.1.0",
     "release-it": "^17.11.0"
   },
   "files": [
