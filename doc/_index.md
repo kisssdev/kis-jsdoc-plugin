@@ -23,6 +23,19 @@ This adds a corresponding &#x27;category&#x27; property on the corresponding doc
 
 ---
 
+### `extractTypeExpression(string) ► string`
+
+![modifier: private](images/badges/modifier-private.svg)
+
+Extracts the type expression from a comment string
+
+Parameters | Type | Description
+--- | --- | ---
+__string__ | `string` | *the comment string*
+__*return*__ | `string` | *the type expression*
+
+---
+
 ### `getFilePath(d) ► string`
 
 ![modifier: private](images/badges/modifier-private.svg)
@@ -59,13 +72,13 @@ Defines the default process on doclet: applying the &#x27;value&#x27; function d
 
 Parameters | Type | Description
 --- | --- | ---
-__cf__ | `Object` | *The configuration object.*
+__cf__ | `object` | *The configuration object.*
 __k__ | `string` | *The key/property of the object.*
 __*return*__ | `function` | *A function that takes a doclet as input and sets the corresponding key/property with the &#x27;value&#x27; function.*
 
 ---
 
-### `processDoclet(doclet)`
+### `processDoclet(doclet) ► void`
 
 ![modifier: private](images/badges/modifier-private.svg)
 
@@ -74,6 +87,7 @@ Processes the specified doclet to add or modify properties based on the processC
 Parameters | Type | Description
 --- | --- | ---
 __doclet__ | `Doclet` | *the specified doclet*
+__*return*__ | `void` | **
 
 ---
 
@@ -191,7 +205,7 @@ Each key of the configuration object defines a process:
     value: d => d.scope === 'static'
   },
   hasParameters: {
-    // add 'hasParameters' property that indicates if the documented object has @param or @return tags?
+    // add 'hasParameters' property that indicates if the documented object has @param or @returns tags?
     value: d => (d.params && d.params.length > 0) || (d.returns && d.returns.length > 0)
   },
   relativepath: {
@@ -202,9 +216,9 @@ Each key of the configuration object defines a process:
     }
   },
   type: {
-    // add 'type' property that indicates the type of a member
-    condition: d => d.kind === 'member' && d.returns && d.returns.length > 0,
-    value: d => d.returns[0].type
+    // add 'type' property that indicates the type of a member when type is expressed as typescript expression that throws error on JSDoc 4
+    condition: d => d.kind === 'member' && d.comment && !d.type,
+    value: d => ({ names: [extractTypeExpression(d.comment)] })
   },
   memberof: {
     // modify the 'memberof' property: fix 'export default var'

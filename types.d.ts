@@ -1,4 +1,3 @@
-
 declare type ReturnsTag = Doclet & {
   type: string;
 };
@@ -36,6 +35,8 @@ declare type Doclet = {
   scope?: string;
   access?: string;
   name?: string;
+  type?: { names: string[] };
+  comment?: string;
   longname?: string;
   memberof?: string;
   meta?: {

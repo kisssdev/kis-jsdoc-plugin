@@ -21,7 +21,7 @@ ___options__ | `Record.<string, any>` | *The options.*
 
 ---
 
-### `accessSorter(d1, d2)`
+### `accessSorter(d1, d2) ► number`
 
 ![modifier: private](images/badges/modifier-private.svg)
 
@@ -31,10 +31,11 @@ Parameters | Type | Description
 --- | --- | ---
 __d1__ | `Doclet` | *first doclet*
 __d2__ | `Doclet` | *second doclet*
+__*return*__ | `number` | *the order delta*
 
 ---
 
-### `toDictionary(array, keyGenerator, valueGenerator) ► Object`
+### `toDictionary(array, keyGenerator, valueGenerator) ► object`
 
 ![modifier: private](images/badges/modifier-private.svg)
 
@@ -42,10 +43,10 @@ Converts an array of object to a dictionary.
 
 Parameters | Type | Description
 --- | --- | ---
-__array__ | `Array.<Object>` | *The array of objects to convert to dictionary.*
+__array__ | `Array.<object>` | *The array of objects to convert to dictionary.*
 __keyGenerator__ | `function` | *The function used to define the key of the object added to the dictionary.*
 __valueGenerator__ | `function` | *The function used to define the value of the object added to the dictionary.*
-__*return*__ | `Object` | *The object acting as a dictionary.*
+__*return*__ | `object` | *The object acting as a dictionary.*
 
 #### Examples
 
@@ -60,7 +61,7 @@ let res = toDictionary([{n:'a', v:1}, {n:'b', v:2}], o => o.n);
 
 ---
 
-### `keyBy(array, keySelector, valueSelector) ► Object`
+### `keyBy(array, keySelector, valueSelector) ► object`
 
 ![modifier: private](images/badges/modifier-private.svg)
 
@@ -69,10 +70,10 @@ The value produced by the specified keySelector is used to define the properties
 
 Parameters | Type | Description
 --- | --- | ---
-__array__ | `Array.<Object>` | *The array of objects to convert to dictionary.*
+__array__ | `Array.<object>` | *The array of objects to convert to dictionary.*
 __keySelector__ | `function` | *The function used to define the key.*
 __valueSelector__ | `function` | *The function used to define the value.*
-__*return*__ | `Object` | *The resulting object.*
+__*return*__ | `object` | *The resulting object.*
 
 #### Examples
 
@@ -115,7 +116,7 @@ __typesIndex__ | `Record.<string, string>` | *The types index - associating a ty
 
 ---
 
-### `compileTemplatesInFolder() ► Record.<string, any>`
+### `compileTemplatesInFolder(folder, registerAsPartial) ► Record.<string, any>`
 
 ![modifier: private](images/badges/modifier-private.svg)
 
@@ -124,6 +125,8 @@ If registerAsPartial is true, templates are only precompiled and no index is ret
 
 Parameters | Type | Description
 --- | --- | ---
+__folder__ | `string` | *the folder that contains the handlebars templates*
+__registerAsPartial__ | `boolean` | *register as partial templates?*
 __*return*__ | `Record.<string, any>` | *The templates index - associating the name of the template with its handlebar compiled template.*
 
 ---
@@ -161,7 +164,7 @@ Generates the documentation file of the given model and handlebars template.
 
 Parameters | Type | Description
 --- | --- | ---
-__model__ | `Object` | *The model to use for the handlebars template.*
+__model__ | `object` | *The model to use for the handlebars template.*
 __template__ | `Handlebars.TemplateDelegate` | *The handlebars template.*
 __docfilename__ | `string` | *The documentation file name.*
 
@@ -189,7 +192,7 @@ Generates the table of contents for the given documentation root node.
 
 Parameters | Type | Description
 --- | --- | ---
-__rootNode__ | `Object` | *The documentation root node for which the table of contents will be generated.*
+__rootNode__ | `object` | *The documentation root node for which the table of contents will be generated.*
 __template__ | `Handlebars.TemplateDelegate` | *The handlebars template.*
 
 ---

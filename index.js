@@ -26,6 +26,49 @@ const config = {
 };
 
 const exportedClasses = [];
+/**
+ * Extracts the type expression from a comment string
+ * @param {string} string - the comment string
+ * @returns {string} the type expression
+ */
+function extractTypeExpression(string) {
+  let count = 0;
+  let position = 0;
+  let expression = '';
+  const startIndex = string.search(/\{[^@]/);
+  let textStartIndex;
+
+  if (startIndex !== -1) {
+    // advance to the first character in the type expression
+    position = textStartIndex = startIndex + 1;
+    count++;
+    while (position < string.length) {
+      switch (string[position]) {
+        case '\\': {
+          // backslash is an escape character, so skip the next character
+          position++;
+          break;
+        }
+        case '{': {
+          count++;
+          break;
+        }
+        case '}': {
+          count--;
+          break;
+        }
+        default:
+        // do nothing
+      }
+      if (count === 0) {
+        expression = string.slice(textStartIndex, position).trim();
+        break;
+      }
+      position++;
+    }
+  }
+  return expression.replaceAll(`{`, '{').replaceAll(`}`, '}');
+}
 
 /**
  * Gets the absolute file path corresponding to the specified doclet.
@@ -51,9 +94,9 @@ const getModuleName = (filename, folderPath) => {
 
 /**
  * Defines the default process on doclet: applying the 'value' function defined on the configuration object to the specified key/property of the doclet instance.
- * @param {Object} cf - The configuration object.
+ * @param {object} cf - The configuration object.
  * @param {string} k - The key/property of the object.
- * @return {function} A function that takes a doclet as input and sets the corresponding key/property with the 'value' function.
+ * @returns {Function} A function that takes a doclet as input and sets the corresponding key/property with the 'value' function.
  */
 const defaultProcess = (cf, k) => d => {
   d[k] = cf.value(d);
@@ -122,7 +165,7 @@ const processConfig = {
     value: d => d.scope === 'static'
   },
   hasParameters: {
-    // add 'hasParameters' property that indicates if the documented object has @param or @return tags?
+    // add 'hasParameters' property that indicates if the documented object has @param or @returns tags?
     value: d => (d.params && d.params.length > 0) || (d.returns && d.returns.length > 0)
   },
   relativepath: {
@@ -133,9 +176,9 @@ const processConfig = {
     }
   },
   type: {
-    // add 'type' property that indicates the type of a member
-    condition: d => d.kind === 'member' && d.returns && d.returns.length > 0,
-    value: d => d.returns[0].type
+    // add 'type' property that indicates the type of a member when type is expressed as typescript expression that throws error on JSDoc 4
+    condition: d => d.kind === 'member' && d.comment && !d.type,
+    value: d => ({ names: [extractTypeExpression(d.comment)] })
   },
   memberof: {
     // modify the 'memberof' property: fix 'export default var'
@@ -185,6 +228,7 @@ const processConfig = {
 /**
  * Processes the specified doclet to add or modify properties based on the processConfig object.
  * @param {Doclet} doclet - the specified doclet
+ * @returns {void}
  */
 const processDoclet = doclet =>
   Object.keys(processConfig)

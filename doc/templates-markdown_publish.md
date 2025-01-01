@@ -18,7 +18,7 @@ Builds a tree of JSDoc doclet data and generates documentation.
 Parameters | Type | Description
 --- | --- | ---
 __data__ | `Salty` | *The database containing comments and tags.*
-__options__ | `Object` | *The JSDoc options.*
+__options__ | `object` | *The JSDoc options.*
 
 ---
 

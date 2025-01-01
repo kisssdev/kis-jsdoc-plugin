@@ -57,7 +57,7 @@ function buildTree(parentNode, doclets, parentLongname) {
 /**
  * Builds a tree of JSDoc doclet data and generates documentation.
  *   @param {Salty} data - The database containing comments and tags.
- *   @param {Object} options - The JSDoc options.
+ *   @param {object} options - The JSDoc options.
  */
 exports.publish = (data, options) => {
   // filter Taffy database to remove undocumented doclets
@@ -66,7 +66,8 @@ exports.publish = (data, options) => {
 
   // build the documentation tree
   const rootNode = /** @type {Doclet} */ ({});
-  buildTree(rootNode, data().get());
+  const doclets = data().get();
+  buildTree(rootNode, doclets);
 
   // generate the doc
   documentGenerator.generateDoc(rootNode, options);

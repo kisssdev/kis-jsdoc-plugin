@@ -3,11 +3,11 @@
 Parameters | Type | Description
 --- | --- | ---
 {{#each params}}
-__{{name}}__ | {{#link type.names.[0]}}{{/link}} | *{{description}}*
+__{{name}}__ | {{#link (inMdTable type.names.[0])}}{{/link}} | *{{description}}*
 {{/each}}
 {{/if}}
 {{#if returns}}
 {{#each returns}}
-__*return*__ | {{#link type.names.[0]}}{{/link}} | *{{description}}*
+__*return*__ | {{#link (inMdTable type.names.[0])}}{{/link}} | *{{description}}*
 {{/each}}
 {{/if}}

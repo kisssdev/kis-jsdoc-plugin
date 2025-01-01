@@ -5,6 +5,7 @@ import prettierRecommended from 'eslint-plugin-prettier/recommended';
 import globals from 'globals';
 import babelParser from '@babel/eslint-parser';
 import eslint from '@eslint/js';
+import jsdoc from 'eslint-plugin-jsdoc';
 
 export default [
   {
@@ -16,6 +17,7 @@ export default [
   promise.configs['flat/recommended'],
   unicorn.configs['flat/recommended'],
   prettierRecommended,
+  jsdoc.configs['flat/recommended-typescript-flavor'],
 
   {
     languageOptions: {
@@ -39,7 +41,6 @@ export default [
       'no-var': 2,
       'prefer-const': 1,
       'no-shadow': 2,
-
       'no-unused-vars': [
         2,
         {
@@ -47,7 +48,6 @@ export default [
           args: 'none'
         }
       ],
-
       'no-use-before-define': 0,
       'no-console': 1,
       'no-alert': 1,
@@ -81,21 +81,18 @@ export default [
       radix: 0,
       'vars-on-top': 2,
       yoda: 2,
-
       camelcase: [
         2,
         {
           properties: 'never'
         }
       ],
-
       'func-names': 0,
       'new-cap': 2,
       'no-nested-ternary': 2,
       'no-new-object': 2,
       'no-underscore-dangle': 0,
       'one-var': [2, 'never'],
-
       'spaced-comment': [
         1,
         'always',
@@ -103,16 +100,20 @@ export default [
           exceptions: ['*']
         }
       ],
-
       'no-return-assign': ['error', 'except-parens'],
-      'unicorn/prefer-spread': 0,
+
       'array-func/prefer-array-from': 0,
+
       'promise/no-promise-in-callback': 0,
+
+      'unicorn/prefer-spread': 0,
       'unicorn/prefer-number-properties': 0,
       'unicorn/prefer-node-protocol': 0,
       'unicorn/no-array-for-each': 0,
       'unicorn/prefer-module': 0,
-      'unicorn/no-array-reduce': 0
+      'unicorn/no-array-reduce': 0,
+
+      'jsdoc/check-tag-names': ['error', { definedTags: ['category'] }]
     }
   }
 ];
