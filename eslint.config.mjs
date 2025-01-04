@@ -24,7 +24,7 @@ export default [
       globals: {
         ...globals.browser,
         ...globals.node,
-        ...globals.jest
+        ...globals.jasmine
       },
       parser: babelParser,
       ecmaVersion: 2019,

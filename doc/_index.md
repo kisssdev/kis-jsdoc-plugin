@@ -36,6 +36,57 @@ __*return*__ | `string` | *the type expression*
 
 ---
 
+### `extractParametersInfo(line) ► Doclet`
+
+![modifier: private](images/badges/modifier-private.svg)
+
+Extracts the type, name and description of the &#x27;param&#x27; tag.
+
+Parameters | Type | Description
+--- | --- | ---
+__line__ | `string` | *the comment line*
+__*return*__ | `Doclet` | *list of parameters*
+
+---
+
+### `extractTagInfo(line, tag) ► Doclet`
+
+![modifier: private](images/badges/modifier-private.svg)
+
+Extracts the type and description of the specified tag.
+
+Parameters | Type | Description
+--- | --- | ---
+__line__ | `string` | *the comment line*
+__tag__ | `'return'` | *the specified tag*
+__*return*__ | `Doclet` | *list of parameters*
+
+---
+
+### `populateFunctionInfo(doclet)`
+
+![modifier: private](images/badges/modifier-private.svg)
+
+Tries to populate &#x27;params&#x27; and &#x27;return&#x27; type and description on the specified doclet if not provided but found through comment
+
+Parameters | Type | Description
+--- | --- | ---
+__doclet__ | `Doclet` | *the doclet to process*
+
+---
+
+### `populateMemberInfo(doclet)`
+
+![modifier: private](images/badges/modifier-private.svg)
+
+Tries to populate type and description on the specified doclet if not provided but found through comment
+
+Parameters | Type | Description
+--- | --- | ---
+__doclet__ | `Doclet` | *the doclet to process*
+
+---
+
 ### `getFilePath(d) ► string`
 
 ![modifier: private](images/badges/modifier-private.svg)
@@ -72,13 +123,13 @@ Defines the default process on doclet: applying the &#x27;value&#x27; function d
 
 Parameters | Type | Description
 --- | --- | ---
-__cf__ | `object` | *The configuration object.*
-__k__ | `string` | *The key/property of the object.*
-__*return*__ | `function` | *A function that takes a doclet as input and sets the corresponding key/property with the &#x27;value&#x27; function.*
+__cf__ | `object` | *the configuration object*
+__k__ | `string` | *the key/property of the object*
+__*return*__ | `function` | *a function that takes a doclet as input and sets the corresponding key/property with the &#x27;value&#x27; function*
 
 ---
 
-### `processDoclet(doclet) ► void`
+### `processDoclet(doclet) ► Doclet`
 
 ![modifier: private](images/badges/modifier-private.svg)
 
@@ -86,8 +137,8 @@ Processes the specified doclet to add or modify properties based on the processC
 
 Parameters | Type | Description
 --- | --- | ---
-__doclet__ | `Doclet` | *the specified doclet*
-__*return*__ | `void` | **
+__doclet__ | `Doclet` | *the specified doclet to modify*
+__*return*__ | `Doclet` | *the modified doclet*
 
 ---
 
@@ -99,7 +150,7 @@ Processes the parsed doclets to provide a better hierarchy.
 
 Parameters | Type | Description
 --- | --- | ---
-__doclets__ | `Array.<Doclet>` | *The array of parsed doclets.*
+__doclets__ | `Array.<Doclet>` | *the array of parsed doclets*
 
 ---
 
@@ -158,7 +209,10 @@ Each key of the configuration object defines a process:
       d.meta.code &&
       d.meta.code.name &&
       (d.meta.code.name.startsWith('export') || (d.tags && d.tags.some(t => t.title === 'export'))),
-    process: d => exportedClasses.push(d.name)
+    process: d => {
+      exportedClasses.push(d.name);
+      return d;
+    }
   },
   tocDescription: {
     // add 'tocDescription' property that represents the description of a module that appears in the toc
@@ -215,11 +269,6 @@ Each key of the configuration object defines a process:
       return path.relative(config.docFolder, filepath); // the relative path of the source file from the documentation folder
     }
   },
-  type: {
-    // add 'type' property that indicates the type of a member when type is expressed as typescript expression that throws error on JSDoc 4
-    condition: d => d.kind === 'member' && d.comment && !d.type,
-    value: d => ({ names: [extractTypeExpression(d.comment)] })
-  },
   memberof: {
     // modify the 'memberof' property: fix 'export default var'
     condition: d => d.kind !== 'module' && !d.memberof && d.longname && d.longname.startsWith('module:'),
@@ -252,6 +301,7 @@ Each key of the configuration object defines a process:
     process: d => {
       d.isDefault = true;
       d.name = 'default';
+      return d;
     }
   },
   fixUndocumented: {
@@ -261,6 +311,22 @@ Each key of the configuration object defines a process:
     condition: d => d.undocumented === true,
     process: d => {
       d.included = false;
+      return d;
+    }
+  },
+  acceptTypeScriptType: {
+    // add 'type' property when type tag is expressed as some funky typescript expression
+    // causing JSDoc to throw an error preventing type to be defined
+    // but still can be retrieved from the comment property
+    condition: d => d.comment?.length > 0,
+    process: d => {
+      if (d.kind === 'member' && !d.type) {
+        populateMemberInfo(d);
+      }
+      if (d.kind === 'function' || d.kind === 'constant') {
+        populateFunctionInfo(d);
+      }
+      return d;
     }
   }
 

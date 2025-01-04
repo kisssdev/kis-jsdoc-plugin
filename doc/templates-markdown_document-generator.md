@@ -16,7 +16,7 @@ Generates the documentation.
 
 Parameters | Type | Description
 --- | --- | ---
-__rootNode__ | `Doclet` | *The documentation root node.*
+__rootNode__ | `Doclet` | *The documentation root node*
 ___options__ | `Record.<string, any>` | *The options.*
 
 ---
@@ -43,9 +43,9 @@ Converts an array of object to a dictionary.
 
 Parameters | Type | Description
 --- | --- | ---
-__array__ | `Array.<object>` | *The array of objects to convert to dictionary.*
-__keyGenerator__ | `function` | *The function used to define the key of the object added to the dictionary.*
-__valueGenerator__ | `function` | *The function used to define the value of the object added to the dictionary.*
+__array__ | `Array.<object>` | *the array of objects to convert to dictionary*
+__keyGenerator__ | `function` | *the function used to define the key of the object added to the dictionary*
+__valueGenerator__ | `function` | *the function used to define the value of the object added to the dictionary*
 __*return*__ | `object` | *The object acting as a dictionary.*
 
 #### Examples
@@ -70,9 +70,9 @@ The value produced by the specified keySelector is used to define the properties
 
 Parameters | Type | Description
 --- | --- | ---
-__array__ | `Array.<object>` | *The array of objects to convert to dictionary.*
-__keySelector__ | `function` | *The function used to define the key.*
-__valueSelector__ | `function` | *The function used to define the value.*
+__array__ | `Array.<object>` | *the array of objects to convert to dictionary*
+__keySelector__ | `function` | *the function used to define the key*
+__valueSelector__ | `function` | *the function used to define the value*
 __*return*__ | `object` | *The resulting object.*
 
 #### Examples
@@ -97,8 +97,8 @@ to a markdown link to the associated type documentation.
 
 Parameters | Type | Description
 --- | --- | ---
-__doclet__ | `Doclet` | *The JSDoc doclet to transform.*
-__typesIndex__ | `Record.<string, string>` | *The types index - associating a type with its documentation file.*
+__doclet__ | `Doclet` | *the JSDoc doclet to transform*
+__typesIndex__ | `Record.<string, string>` | *the types index - associating a type with its documentation file*
 
 ---
 
@@ -111,8 +111,8 @@ and all of its descendants to a markdown link to the associated type documentati
 
 Parameters | Type | Description
 --- | --- | ---
-__doclet__ | `Doclet` | *The JSDoc doclet to transform.*
-__typesIndex__ | `Record.<string, string>` | *The types index - associating a type with its documentation file.*
+__doclet__ | `Doclet` | *the JSDoc doclet to transform*
+__typesIndex__ | `Record.<string, string>` | *the types index - associating a type with its documentation file*
 
 ---
 
@@ -127,7 +127,7 @@ Parameters | Type | Description
 --- | --- | ---
 __folder__ | `string` | *the folder that contains the handlebars templates*
 __registerAsPartial__ | `boolean` | *register as partial templates?*
-__*return*__ | `Record.<string, any>` | *The templates index - associating the name of the template with its handlebar compiled template.*
+__*return*__ | `Record.<string, any>` | *the templates index - associating the name of the template with its handlebar compiled template*
 
 ---
 
@@ -139,7 +139,7 @@ Compiles the handlebars templates and defines a templates index.
 
 Parameters | Type | Description
 --- | --- | ---
-__*return*__ | `Record.<string, any>` | *The templates index - associating the name of the template with its handlebar compiled template.*
+__*return*__ | `Record.<string, any>` | *the templates index - associating the name of the template with its handlebar compiled template*
 
 ---
 
@@ -151,8 +151,8 @@ Defines the name of the documentation file of the specified JSDoc doclet.
 
 Parameters | Type | Description
 --- | --- | ---
-__doclet__ | `Doclet` | *The specified JSDoc doclet.*
-__*return*__ | `string` | *The documentation file name.*
+__doclet__ | `Doclet` | *the specified JSDoc doclet*
+__*return*__ | `string` | *the documentation file name*
 
 ---
 
@@ -164,9 +164,9 @@ Generates the documentation file of the given model and handlebars template.
 
 Parameters | Type | Description
 --- | --- | ---
-__model__ | `object` | *The model to use for the handlebars template.*
-__template__ | `Handlebars.TemplateDelegate` | *The handlebars template.*
-__docfilename__ | `string` | *The documentation file name.*
+__model__ | `object` | *the model to use for the handlebars template*
+__template__ | `Handlebars.TemplateDelegate` | *the handlebars template*
+__docfilename__ | `string` | *the documentation file name*
 
 ---
 
@@ -178,9 +178,9 @@ Generates the documentation for the given JSDoc doclet.
 
 Parameters | Type | Description
 --- | --- | ---
-__doclet__ | `Doclet` | *The JSDoc doclet for which the documentation will be generated.*
-__template__ | `Handlebars.TemplateDelegate` | *The handlebars template.*
-__typesIndex__ | `Record.<string, any>` | *The types index - associating a type with its documentation file.*
+__doclet__ | `Doclet` | *the JSDoc doclet for which the documentation will be generated*
+__template__ | `Handlebars.TemplateDelegate` | *the handlebars template*
+__typesIndex__ | `Record.<string, any>` | *the types index - associating a type with its documentation file*
 
 ---
 
@@ -192,8 +192,8 @@ Generates the table of contents for the given documentation root node.
 
 Parameters | Type | Description
 --- | --- | ---
-__rootNode__ | `object` | *The documentation root node for which the table of contents will be generated.*
-__template__ | `Handlebars.TemplateDelegate` | *The handlebars template.*
+__rootNode__ | `object` | *the documentation root node for which the table of contents will be generated*
+__template__ | `Handlebars.TemplateDelegate` | *the handlebars template*
 
 ---
 
@@ -213,8 +213,8 @@ Initializes handlebars, registers custom helpers and compilates templates.
 
 Parameters | Type | Description
 --- | --- | ---
-__typesIndex__ | `string` | *The types index - associating a type with its documentation file.*
-__*return*__ | `Record.<string, any>` | *The templates index - associating the name of the template with its handlebar compiled template.*
+__typesIndex__ | `string` | *the types index - associating a type with its documentation file*
+__*return*__ | `Record.<string, any>` | *the templates index - associating the name of the template with its handlebar compiled template*
 
 ---
 

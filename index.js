@@ -26,15 +26,17 @@ const config = {
 };
 
 const exportedClasses = [];
+
 /**
  * Extracts the type expression from a comment string
- * @param {string} string - the comment string
- * @returns {string} the type expression
+ * @param {string} string the comment string
+ * @returns {string | undefined} the type expression
  */
 function extractTypeExpression(string) {
+  if (!string) return;
   let count = 0;
   let position = 0;
-  let expression = '';
+  let expression;
   const startIndex = string.search(/\{[^@]/);
   let textStartIndex;
 
@@ -67,12 +69,90 @@ function extractTypeExpression(string) {
       position++;
     }
   }
-  return expression.replaceAll(`{`, '{').replaceAll(`}`, '}');
+  return expression?.replaceAll(`{`, '{')?.replaceAll(`}`, '}');
+}
+
+/**
+ * Extracts the type, name and description of the 'param' tag.
+ * @param {string} line the comment line
+ * @returns {Doclet | undefined} list of parameters
+ */
+function extractParametersInfo(line) {
+  if (!line || !line.includes('@param')) return;
+  const type = extractTypeExpression(line);
+  if (!type) return;
+  const position = line.indexOf(type) + type.length + 1;
+  const nameStartIndex = position + line.slice(position).search(/[^\s]/);
+  const nameEndIndex = nameStartIndex + line.slice(nameStartIndex).search(/\s/);
+  const name = line.slice(nameStartIndex, nameEndIndex);
+  const descriptionStartIndex = nameEndIndex + line.slice(nameEndIndex).search(/[^\s]/);
+  const description = line.slice(descriptionStartIndex);
+  return { type: { names: [type] }, name, description };
+}
+
+/**
+ * Extracts the type and description of the specified tag.
+ * @param {string} line the comment line
+ * @param {'return' | 'type'} tag the specified tag
+ * @returns {Doclet | undefined} list of parameters
+ */
+function extractTagInfo(line, tag) {
+  if (!line || !line.includes(tag)) return;
+  const type = extractTypeExpression(line);
+  if (!type) return;
+  const position = line.indexOf(type) + type.length + 1;
+  const descriptionStartIndex = position + line.slice(position).search(/[^\s]/);
+  const trailingCommentIndex = line.slice(descriptionStartIndex).search(/\*\//);
+  const description =
+    trailingCommentIndex === -1
+      ? line.slice(descriptionStartIndex)
+      : line.slice(descriptionStartIndex, descriptionStartIndex + trailingCommentIndex - 1);
+  return { type: { names: [type] }, description };
+}
+
+/**
+ * Tries to populate 'params' and 'return' type and description on the specified doclet if not provided but found through comment
+ * @param {Doclet} doclet the doclet to process
+ */
+function populateFunctionInfo(doclet) {
+  if (doclet.comment?.length <= 0) return;
+  const parameterLines = doclet.comment.split(/\n/).filter(l => l.includes('@param'));
+  if (parameterLines?.length !== doclet.params?.length) return;
+  for (const [index, parameterLine] of parameterLines.entries()) {
+    const parameterInfo = extractParametersInfo(parameterLine);
+    if (parameterInfo && !doclet.params[index].type) {
+      doclet.params[index].type = parameterInfo.type;
+      doclet.params[index].description = parameterInfo.description;
+    }
+  }
+  const returnLines = doclet.comment.split(/\n/).filter(l => l.includes('@return'));
+  if (returnLines?.length !== doclet.returns?.length) return;
+  for (const [index, returnLine] of returnLines.entries()) {
+    const returnInfo = extractTagInfo(returnLine, 'return');
+    if (returnInfo && !doclet.returns[index].type) {
+      doclet.returns[index].type = returnInfo.type;
+      doclet.returns[index].description = returnInfo.description;
+    }
+  }
+}
+
+/**
+ * Tries to populate type and description on the specified doclet if not provided but found through comment
+ * @param {Doclet} doclet the doclet to process
+ */
+function populateMemberInfo(doclet) {
+  if (doclet.comment?.length <= 0) return;
+  const typeLines = doclet.comment.split(/\n/).filter(l => l.includes('@type'));
+  if (typeLines?.length !== 1) return;
+  const typeLine = typeLines[0];
+  const typeInfo = extractTagInfo(typeLine, 'type');
+  if (typeInfo?.type && !doclet.type) doclet.type = typeInfo.type;
+  if (typeInfo?.description && !doclet.description) doclet.description = typeInfo.description;
 }
 
 /**
  * Gets the absolute file path corresponding to the specified doclet.
- * @param {Doclet} d - the specified doclet
+ * @param {Doclet} d the specified doclet
  * @returns {string} the absolute file path
  */
 const getFilePath = d => path.join(d.meta.path, d.meta.filename);
@@ -80,8 +160,8 @@ const getFilePath = d => path.join(d.meta.path, d.meta.filename);
 /**
  * Get the module name corresponding to the given filename and path.
  * In case of index.js the folder name is used.
- * @param {string} filename - the given filename
- * @param {string} folderPath - the given folder path containing the file
+ * @param {string} filename the given filename
+ * @param {string} folderPath the given folder path containing the file
  * @returns {string} the module name
  */
 const getModuleName = (filename, folderPath) => {
@@ -94,12 +174,13 @@ const getModuleName = (filename, folderPath) => {
 
 /**
  * Defines the default process on doclet: applying the 'value' function defined on the configuration object to the specified key/property of the doclet instance.
- * @param {object} cf - The configuration object.
- * @param {string} k - The key/property of the object.
- * @returns {Function} A function that takes a doclet as input and sets the corresponding key/property with the 'value' function.
+ * @param {object} cf the configuration object
+ * @param {string} k the key/property of the object
+ * @returns {Function} a function that takes a doclet as input and sets the corresponding key/property with the 'value' function
  */
 const defaultProcess = (cf, k) => d => {
   d[k] = cf.value(d);
+  return d;
 };
 
 /**
@@ -113,12 +194,16 @@ const defaultProcess = (cf, k) => d => {
 const processConfig = {
   isExportedClass: {
     // add 'isExportedClass' property that indicates if the class is exported
+    // and add this class to the list of exported classes
     condition: d =>
       d.kind === 'class' &&
       d.meta.code &&
       d.meta.code.name &&
       (d.meta.code.name.startsWith('export') || (d.tags && d.tags.some(t => t.title === 'export'))),
-    process: d => exportedClasses.push(d.name)
+    process: d => {
+      exportedClasses.push(d.name);
+      return d;
+    }
   },
   tocDescription: {
     // add 'tocDescription' property that represents the description of a module that appears in the toc
@@ -175,11 +260,6 @@ const processConfig = {
       return path.relative(config.docFolder, filepath); // the relative path of the source file from the documentation folder
     }
   },
-  type: {
-    // add 'type' property that indicates the type of a member when type is expressed as typescript expression that throws error on JSDoc 4
-    condition: d => d.kind === 'member' && d.comment && !d.type,
-    value: d => ({ names: [extractTypeExpression(d.comment)] })
-  },
   memberof: {
     // modify the 'memberof' property: fix 'export default var'
     condition: d => d.kind !== 'module' && !d.memberof && d.longname && d.longname.startsWith('module:'),
@@ -212,6 +292,7 @@ const processConfig = {
     process: d => {
       d.isDefault = true;
       d.name = 'default';
+      return d;
     }
   },
   fixUndocumented: {
@@ -221,25 +302,45 @@ const processConfig = {
     condition: d => d.undocumented === true,
     process: d => {
       d.included = false;
+      return d;
+    }
+  },
+  acceptTypeScriptType: {
+    // add 'type' property when type tag is expressed as some funky typescript expression
+    // causing JSDoc to throw an error preventing type to be defined
+    // but still can be retrieved from the comment property
+    condition: d => d.comment?.length > 0,
+    process: d => {
+      if (d.kind === 'member' && !d.type) {
+        populateMemberInfo(d);
+      }
+      if (d.kind === 'function' || d.kind === 'constant') {
+        populateFunctionInfo(d);
+      }
+      return d;
     }
   }
 };
 
 /**
  * Processes the specified doclet to add or modify properties based on the processConfig object.
- * @param {Doclet} doclet - the specified doclet
- * @returns {void}
+ * @param {Doclet} doclet the specified doclet to modify
+ * @returns {Doclet} the modified doclet
  */
-const processDoclet = doclet =>
-  Object.keys(processConfig)
-    .filter(k => processConfig[k].condition === undefined || processConfig[k].condition(doclet))
-    .forEach(k => (processConfig[k].process || defaultProcess(processConfig[k], k))(doclet));
+function processDoclet(doclet) {
+  let modifiedDoclet = doclet;
+  for (const k of Object.keys(processConfig)) {
+    if (processConfig[k].condition && processConfig[k].condition(doclet) === false) continue;
+    modifiedDoclet = (processConfig[k].process || defaultProcess(processConfig[k], k))(modifiedDoclet);
+  }
+  return modifiedDoclet;
+}
 
 /**
  * Processes the parsed doclets to provide a better hierarchy.
- * @param {Doclet[]} doclets - The array of parsed doclets.
+ * @param {Doclet[]} doclets the array of parsed doclets
  */
-const processDoclets = doclets => {
+function processDoclets(doclets) {
   // 1: all js files with comments
   const documentedFiles = new Set(doclets.filter(d => !d.undocumented).map(d => getFilePath(d)));
   // 2: js files documented as @module
@@ -283,7 +384,7 @@ const processDoclets = doclets => {
     return doclet;
   });
   modules.forEach(m => doclets.push(m));
-};
+}
 
 /**
  * Defines the event handlers of the JSDoc plugin.

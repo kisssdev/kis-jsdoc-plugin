@@ -1,11 +1,3 @@
-declare type ReturnsTag = Doclet & {
-  type: string;
-};
-
-declare type ParamTag = {
-  type: string;
-};
-
 declare type TagTag = {
   title: string;
   text: string;
@@ -23,7 +15,7 @@ declare type Doclet = {
   parameters?: Doclet[];
   members?: Doclet[];
   constants?: Doclet[];
-  returns?: ReturnsTag[];
+  returns?: Doclet[];
   kind?: string;
   undocumented?: boolean;
   included?: boolean;
@@ -53,7 +45,7 @@ declare type Doclet = {
       };
     };
   };
-  params?: ParamTag[];
+  params?: Doclet[];
   tags?: TagTag[];
 };
 

@@ -37,17 +37,17 @@ const order = { public: 0, protected: 1, private: 2 };
 
 /**
  * Sorts doclets by their access property
- * @param {Doclet} d1 - first doclet
- * @param {Doclet} d2 - second doclet
+ * @param {Doclet} d1 first doclet
+ * @param {Doclet} d2 second doclet
  * @returns {number} the order delta
  */
 const accessSorter = (d1, d2) => order[d1.access] - order[d2.access];
 
 /**
  * Converts an array of object to a dictionary.
- * @param {object[]} array - The array of objects to convert to dictionary.
- * @param {Function} keyGenerator - The function used to define the key of the object added to the dictionary.
- * @param {Function} [valueGenerator] - The function used to define the value of the object added to the dictionary.
+ * @param {object[]} array the array of objects to convert to dictionary
+ * @param {Function} keyGenerator the function used to define the key of the object added to the dictionary
+ * @param {Function} [valueGenerator] the function used to define the value of the object added to the dictionary
  * @returns {object} The object acting as a dictionary.
  * @example
  * let res = toDictionary([{n:'a', v:1}, {n:'b', v:2}], o => o.n, o => o.v);
@@ -65,9 +65,9 @@ const toDictionary = (array, keyGenerator, valueGenerator = item => item) =>
 /**
  * Converts an array of object to an object containing arrays.
  * The value produced by the specified keySelector is used to define the properties of the resulting object.
- * @param {object[]} array - The array of objects to convert to dictionary.
- * @param {Function} keySelector - The function used to define the key.
- * @param {Function} [valueSelector] - The function used to define the value.
+ * @param {object[]} array the array of objects to convert to dictionary
+ * @param {Function} keySelector the function used to define the key
+ * @param {Function} [valueSelector] the function used to define the value
  * @returns {object} The resulting object.
  * @example
  * let res = keyBy([{n:'a', v:1}, {n:'b', v:2}, {n:'a', v:3}], o => o.n, o => o.v);
@@ -87,8 +87,8 @@ const keyBy = (array, keySelector, valueSelector = item => item) =>
 /**
  * Transforms {\@link MyClass} or {\@link url|A text} inline tags within the specified JSDoc doclet
  * to a markdown link to the associated type documentation.
- * @param {Doclet} doclet - The JSDoc doclet to transform.
- * @param {Record<string, string>} typesIndex - The types index - associating a type with its documentation file.
+ * @param {Doclet} doclet the JSDoc doclet to transform
+ * @param {Record<string, string>} typesIndex the types index - associating a type with its documentation file
  */
 function generateLinks(doclet, typesIndex) {
   const regexp = /\{@link\s+([^|\s]+)(|[^{]+)?\}/gi; // capture only {@link namepathOrURL} or {@link namepathOrURL|link text}
@@ -108,8 +108,8 @@ function generateLinks(doclet, typesIndex) {
 /**
  * Transforms {\@link MyClass} or {\@link url|A text} inline tags within the specified JSDoc doclet
  * and all of its descendants to a markdown link to the associated type documentation.
- * @param {Doclet} doclet - The JSDoc doclet to transform.
- * @param {Record<string, string>} typesIndex - The types index - associating a type with its documentation file.
+ * @param {Doclet} doclet the JSDoc doclet to transform
+ * @param {Record<string, string>} typesIndex the types index - associating a type with its documentation file
  */
 function generateLinksRecursively(doclet, typesIndex) {
   generateLinks(doclet, typesIndex);
@@ -125,7 +125,7 @@ function generateLinksRecursively(doclet, typesIndex) {
  * If registerAsPartial is true, templates are only precompiled and no index is returned.
  * @param {string} folder the folder that contains the handlebars templates
  * @param {boolean} registerAsPartial register as partial templates?
- * @returns {Record<string, any>} The templates index - associating the name of the template with its handlebar compiled template.
+ * @returns {Record<string, any>} the templates index - associating the name of the template with its handlebar compiled template
  */
 function compileTemplatesInFolder(folder, registerAsPartial = false) {
   const templates = {};
@@ -151,7 +151,7 @@ function compileTemplatesInFolder(folder, registerAsPartial = false) {
 
 /**
  * Compiles the handlebars templates and defines a templates index.
- * @returns {Record<string, any>} The templates index - associating the name of the template with its handlebar compiled template.
+ * @returns {Record<string, any>} the templates index - associating the name of the template with its handlebar compiled template
  */
 function compileTemplates() {
   let templates = {};
@@ -167,8 +167,8 @@ function compileTemplates() {
 
 /**
  * Defines the name of the documentation file of the specified JSDoc doclet.
- * @param {Doclet} doclet - The specified JSDoc doclet.
- * @returns {string} The documentation file name.
+ * @param {Doclet} doclet the specified JSDoc doclet
+ * @returns {string} the documentation file name
  */
 function defineDocfilename(doclet) {
   const uniquePath = path
@@ -179,9 +179,9 @@ function defineDocfilename(doclet) {
 
 /**
  * Generates the documentation file of the given model and handlebars template.
- * @param {object} model - The model to use for the handlebars template.
- * @param {Handlebars.TemplateDelegate} template - The handlebars template.
- * @param {string} docfilename - The documentation file name.
+ * @param {object} model the model to use for the handlebars template
+ * @param {Handlebars.TemplateDelegate} template the handlebars template
+ * @param {string} docfilename the documentation file name
  */
 function generateDocfile(model, template, docfilename) {
   if (!template) {
@@ -202,9 +202,9 @@ function generateDocfile(model, template, docfilename) {
 
 /**
  * Generates the documentation for the given JSDoc doclet.
- * @param {Doclet} doclet - The JSDoc doclet for which the documentation will be generated.
- * @param {Handlebars.TemplateDelegate} template - The handlebars template.
- * @param {Record<string, any>} typesIndex - The types index - associating a type with its documentation file.
+ * @param {Doclet} doclet the JSDoc doclet for which the documentation will be generated
+ * @param {Handlebars.TemplateDelegate} template the handlebars template
+ * @param {Record<string, any>} typesIndex the types index - associating a type with its documentation file
  */
 function generateDocument(doclet, template, typesIndex) {
   generateLinksRecursively(doclet, typesIndex);
@@ -222,8 +222,8 @@ function generateDocument(doclet, template, typesIndex) {
 
 /**
  * Generates the table of contents for the given documentation root node.
- * @param {object} rootNode - The documentation root node for which the table of contents will be generated.
- * @param {Handlebars.TemplateDelegate} template - The handlebars template.
+ * @param {object} rootNode the documentation root node for which the table of contents will be generated
+ * @param {Handlebars.TemplateDelegate} template the handlebars template
  */
 function generateToc(rootNode, template) {
   if (!rootNode.modules) return;
@@ -252,8 +252,8 @@ function copyResources() {
 
 /**
  * Initializes handlebars, registers custom helpers and compilates templates.
- * @param {string} typesIndex - The types index - associating a type with its documentation file.
- * @returns {Record<string, any>} The templates index - associating the name of the template with its handlebar compiled template.
+ * @param {string} typesIndex the types index - associating a type with its documentation file
+ * @returns {Record<string, any>} the templates index - associating the name of the template with its handlebar compiled template
  */
 function initHandlebars(typesIndex) {
   Handlebars.registerHelper('join', (context, options) => {
@@ -270,15 +270,15 @@ function initHandlebars(typesIndex) {
   Handlebars.registerHelper('link', item =>
     item && typesIndex[item] ? `[${item}](${typesIndex[item]})` : `\`${item}\``
   );
-  Handlebars.registerHelper('inMdTable', item => item.replaceAll('|', String.raw`\|`));
+  Handlebars.registerHelper('inMdTable', item => (item ? item.replaceAll('|', String.raw`\|`) : item));
   Handlebars.registerHelper('options', context => options[context]);
   return compileTemplates();
 }
 
 /**
  * Generates the documentation.
- *   @param {Doclet} rootNode - The documentation root node.
- *   @param {Record<string, any>} [_options] - The options.
+ *   @param {Doclet} rootNode The documentation root node
+ *   @param {Record<string, any>} [_options] The options.
  */
 exports.generateDoc = (rootNode, _options) => {
   // generate an index of the class type <-> doc file

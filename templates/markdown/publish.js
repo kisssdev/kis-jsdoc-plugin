@@ -26,9 +26,9 @@ const configuration = {
 
 /**
  * Attaches the given JSDoc doclet to the given parent node.
- * @param {Doclet} doclet - The JSDoc doclet to attach.
- * @param {Doclet} parentNode - The parent node on which to attach the JSDoc doclet.
- * @param {Doclet[]} doclets - The array of all JSDoc doclets.
+ * @param {Doclet} doclet the JSDoc doclet to attach
+ * @param {Doclet} parentNode the parent node on which to attach the JSDoc doclet
+ * @param {Doclet[]} doclets the array of all JSDoc doclets
  */
 function attachToParent(doclet, parentNode, doclets) {
   // identify the process depending of the doclet kind
@@ -44,9 +44,9 @@ function attachToParent(doclet, parentNode, doclets) {
 
 /**
  * Builds the documentation tree recursively.
- * @param {Doclet} parentNode - The parent node.
- * @param {Doclet[]} doclets - The array of all JSDoc doclets.
- * @param {string} [parentLongname] - The JSDoc long name of the parent.
+ * @param {Doclet} parentNode the parent node
+ * @param {Doclet[]} doclets the array of all JSDoc doclets
+ * @param {string} [parentLongname] the JSDoc long name of the parent
  */
 function buildTree(parentNode, doclets, parentLongname) {
   doclets
@@ -56,8 +56,8 @@ function buildTree(parentNode, doclets, parentLongname) {
 
 /**
  * Builds a tree of JSDoc doclet data and generates documentation.
- *   @param {Salty} data - The database containing comments and tags.
- *   @param {object} options - The JSDoc options.
+ *   @param {Salty} data the database containing comments and tags
+ *   @param {object} options the JSDoc options
  */
 exports.publish = (data, options) => {
   // filter Taffy database to remove undocumented doclets

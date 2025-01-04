@@ -17,8 +17,8 @@ Builds a tree of JSDoc doclet data and generates documentation.
 
 Parameters | Type | Description
 --- | --- | ---
-__data__ | `Salty` | *The database containing comments and tags.*
-__options__ | `object` | *The JSDoc options.*
+__data__ | `Salty` | *the database containing comments and tags*
+__options__ | `object` | *the JSDoc options*
 
 ---
 
@@ -30,9 +30,9 @@ Attaches the given JSDoc doclet to the given parent node.
 
 Parameters | Type | Description
 --- | --- | ---
-__doclet__ | `Doclet` | *The JSDoc doclet to attach.*
-__parentNode__ | `Doclet` | *The parent node on which to attach the JSDoc doclet.*
-__doclets__ | `Array.<Doclet>` | *The array of all JSDoc doclets.*
+__doclet__ | `Doclet` | *the JSDoc doclet to attach*
+__parentNode__ | `Doclet` | *the parent node on which to attach the JSDoc doclet*
+__doclets__ | `Array.<Doclet>` | *the array of all JSDoc doclets*
 
 ---
 
@@ -44,9 +44,9 @@ Builds the documentation tree recursively.
 
 Parameters | Type | Description
 --- | --- | ---
-__parentNode__ | `Doclet` | *The parent node.*
-__doclets__ | `Array.<Doclet>` | *The array of all JSDoc doclets.*
-__parentLongname__ | `string` | *The JSDoc long name of the parent.*
+__parentNode__ | `Doclet` | *the parent node*
+__doclets__ | `Array.<Doclet>` | *the array of all JSDoc doclets*
+__parentLongname__ | `string` | *the JSDoc long name of the parent*
 
 ---
 
