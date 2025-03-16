@@ -4,7 +4,7 @@
 
 Defines a JSDoc plugin that adds custom properties to doclets and provides a new category tag.
 
-[Source file](..\index.js)
+[Source file](../index.js)
 
 ## Functions
 
@@ -266,12 +266,31 @@ Each key of the configuration object defines a process:
     // add 'relativepath' property that indicates the relative path from the documentation to the source code
     value: d => {
       const filepath = getFilePath(d); // the absolute path of the source file
-      return path.relative(config.docFolder, filepath); // the relative path of the source file from the documentation folder
+      return path.relative(config.docFolder, filepath).replaceAll(path.sep, path.posix.sep); // the relative path of the source file from the documentation folder
+    }
+  },
+  fixDotPathForModule: {
+    // fix a jsdoc issue: 'longname' and 'memberof' are corrupted when file path contains a dot: 'module' string appears in the middle of 'longname'
+    condition: d => d.longname?.indexOf(tagModule) > 0 && d.kind === 'module',
+    process: d => {
+      d.name = d.longname.replace(tagModule, '');
+      d.longname = tagModule + d.name;
+      if (d.memberof) delete d.memberof;
+      return d;
+    }
+  },
+  fixDotPathForNonModule: {
+    // fix a jsdoc issue: 'longname' and 'memberof' are corrupted when file path contains a dot: 'module' string appears in the middle of 'longname'
+    condition: d => d.longname?.indexOf(tagModule) > 0 && d.kind !== 'module',
+    process: d => {
+      d.longname = tagModule + d.longname.replace(tagModule, '');
+      d.memberof = tagModule + d.memberof.replace(tagModule, '');
+      return d;
     }
   },
   memberof: {
     // modify the 'memberof' property: fix 'export default var'
-    condition: d => d.kind !== 'module' && !d.memberof && d.longname && d.longname.startsWith('module:'),
+    condition: d => d.kind !== 'module' && !d.memberof && d.longname && d.longname.startsWith(tagModule),
     value: d => d.longname
   },
   access: {
@@ -297,7 +316,7 @@ Each key of the configuration object defines a process:
   },
   isDefault: {
     // add 'isDefault' property that indicates if the documented object is the default export of the module
-    condition: d => d.kind !== 'module' && d.name && d.name.startsWith('module:'),
+    condition: d => d.kind !== 'module' && d.name && d.name.startsWith(tagModule),
     process: d => {
       d.isDefault = true;
       d.name = 'default';

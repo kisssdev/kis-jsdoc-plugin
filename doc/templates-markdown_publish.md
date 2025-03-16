@@ -5,7 +5,7 @@
 Defines a JSDoc template that creates a code tree based on the JSDoc doclets
 and calls the docgenerator.
 
-[Source file](..\templates\markdown\publish.js)
+[Source file](../templates/markdown/publish.js)
 
 ## Functions
 

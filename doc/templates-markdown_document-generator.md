@@ -4,7 +4,7 @@
 
 Defines a markdown document generator that uses handlebars templates.
 
-[Source file](..\templates\markdown\document-generator.js)
+[Source file](../templates/markdown/document-generator.js)
 
 ## Functions
 
