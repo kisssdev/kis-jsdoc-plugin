@@ -1,0 +1,28 @@
+# Runs the linter and the tests on every pull request (including Dependabot ones) and checks
+# that the published dependencies have no known vulnerability.
+name: CI
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci --ignore-scripts
+
+      - run: npm test
+
+      # only the dependencies shipped to the plugin users are blocking: dev tooling advisories are left to Dependabot
+      - run: npm audit --omit=dev --audit-level=moderate
