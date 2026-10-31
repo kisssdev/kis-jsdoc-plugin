@@ -1,14 +1,18 @@
-# Keeps the dependencies up to date with few pull requests: one per week for npm, one per month for GitHub Actions.
+# Keeps the dependencies up to date with few pull requests: once a month for npm and GitHub Actions.
 # Security updates (enabled in the repository settings) are not grouped and are opened as soon as an advisory is published.
 version: 2
 updates:
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
     # a new release has to be a few days old before being proposed (protects against compromised releases)
     cooldown:
       default-days: 7
+    ignore:
+      # new majors bring many opinionated rules: upgraded by hand when wanted
+      - dependency-name: eslint-plugin-unicorn
+        update-types: [version-update:semver-major]
     groups:
       dev-dependencies:
         dependency-type: development
