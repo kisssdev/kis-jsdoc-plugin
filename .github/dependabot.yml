@@ -1,5 +1,5 @@
 # Keeps the dependencies up to date with few pull requests: once a month for npm and GitHub Actions.
-# Security updates (enabled in the repository settings) are not grouped and are opened as soon as an advisory is published.
+# Security updates (enabled in the repository settings) are grouped in one PR, opened as soon as an advisory is published.
 version: 2
 updates:
   - package-ecosystem: npm
@@ -20,6 +20,10 @@ updates:
       dependencies:
         dependency-type: production
         update-types: [minor, patch]
+      # all the security fixes in a single PR, updated when a new advisory is published
+      security-updates:
+        applies-to: security-updates
+        patterns: ['*']
 
   - package-ecosystem: github-actions
     directory: /
