@@ -37,7 +37,7 @@ const exportedClasses = [];
 function extractTypeExpression(string) {
   if (!string) return;
   let count = 0;
-  let position = 0;
+  let position;
   let expression;
   const startIndex = string.search(/\{[^@]/);
   let textStartIndex;
