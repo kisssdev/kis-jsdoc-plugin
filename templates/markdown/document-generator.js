@@ -3,7 +3,7 @@
  * @module
  * @category Core
  */
-const fs = require('fs-extra');
+const fs = require('fs');
 const path = require('path');
 const Handlebars = require('handlebars');
 // @ts-ignore
@@ -191,7 +191,7 @@ function generateDocfile(model, template, docfilename) {
   try {
     const result = template(model);
     const docfilepath = path.join(config.docFolder, docfilename);
-    fs.ensureFileSync(docfilepath);
+    fs.mkdirSync(path.dirname(docfilepath), { recursive: true });
     fs.writeFile(docfilepath, result, config.encoding, error => {
       if (error) logger.error(`Unable to save ${docfilepath}: ${error.message}`);
     });
@@ -231,7 +231,7 @@ function generateToc(rootNode, template) {
   const colorByCategory = config.badgecolors;
   const tocSorter = (c1, c2) => config.tocOrder[c1] - config.tocOrder[c2];
   const toc = Object.keys(documentByCategory)
-    .sort(tocSorter)
+    .toSorted(tocSorter)
     .map(cat => ({
       name: cat,
       entries: documentByCategory[cat],
@@ -245,7 +245,7 @@ function generateToc(rootNode, template) {
  */
 function copyResources() {
   const resourcesFolder = path.join(config.rootFolder, 'resources');
-  fs.copy(resourcesFolder, config.docFolder, error => {
+  fs.cp(resourcesFolder, config.docFolder, { recursive: true }, error => {
     if (error) logger.error(`Unable to copy resources in documentation folder ${config.docFolder}: ${error}`);
   });
 }

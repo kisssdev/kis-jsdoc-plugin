@@ -1,0 +1,92 @@
+# Stages the package on npm when a merged PR brings a new version in package.json.
+# npm authentication relies on npm trusted publishing (OIDC): no npm token is stored in GitHub.
+# The staged version goes public only once a maintainer approves it on npmjs.com with 2FA,
+# then the draft GitHub release has to be published to create the git tag.
+name: Release
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+# never run two releases at the same time
+concurrency: release
+
+permissions:
+  contents: write # creates the draft GitHub release
+  issues: write # creates the approval reminder issue
+  id-token: write # npm trusted publishing
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+          cache: npm
+
+      # staged publishing requires npm >= 11.15.0
+      - run: npm install --global npm@^11.15.0
+
+      - name: Check whether the version is already published or staged
+        id: version
+        run: |
+          NAME=$(node -p "require('./package.json').name")
+          VERSION=$(node -p "require('./package.json').version")
+          PUBLISHED=$(npm view "$NAME@$VERSION" version 2>/dev/null || true)
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if [ "$PUBLISHED" = "$VERSION" ]; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::$NAME@$VERSION is already published, nothing to release."
+          # a (draft) GitHub release means the version has already been staged and awaits approval
+          elif gh release list --limit 100 --json tagName --jq '.[].tagName' | grep -Fxq "$VERSION"; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::$NAME@$VERSION is already staged, approve it on npmjs.com."
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+          # prereleases (e.g. 5.1.0-0) go to the 'next' dist-tag, like release-it does
+          if [[ "$VERSION" == *-* ]]; then
+            echo "dist-tag=next" >> "$GITHUB_OUTPUT"
+            echo "prerelease=--prerelease" >> "$GITHUB_OUTPUT"
+          else
+            echo "dist-tag=latest" >> "$GITHUB_OUTPUT"
+            echo "prerelease=" >> "$GITHUB_OUTPUT"
+          fi
+
+      # no build step: install scripts are skipped, none of the dependencies needs one
+      - if: steps.version.outputs.publish == 'true'
+        run: npm ci --ignore-scripts
+
+      - if: steps.version.outputs.publish == 'true'
+        run: npm test
+
+      - if: steps.version.outputs.publish == 'true'
+        run: npm stage publish --tag ${{ steps.version.outputs.dist-tag }}
+
+      # a draft release creates no git tag: the tag is created when the draft is published
+      - name: Create the draft GitHub release and the approval reminder
+        if: steps.version.outputs.publish == 'true'
+        env:
+          NAME: ${{ steps.version.outputs.name }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          RELEASE_URL=$(gh release create "$VERSION" --draft --target "$GITHUB_SHA" --title "$VERSION" --generate-notes ${{ steps.version.outputs.prerelease }})
+          BODY="$NAME@$VERSION has been staged on npm and awaits your approval.
+
+          - [ ] Approve it in the **Staged Packages** tab of https://www.npmjs.com/package/$NAME (or \`npm stage list\` / \`npm stage approve <stage-id>\`)
+          - [ ] Publish the draft GitHub release, which creates the \`$VERSION\` git tag: $RELEASE_URL
+          - [ ] Close this issue
+
+          If you reject the staged version, delete the draft release and close this issue."
+          echo "$BODY" >> "$GITHUB_STEP_SUMMARY"
+          # the reminder issue notifies the person who merged (requires issues to be enabled on the repository)
+          gh issue create --assignee "$GITHUB_ACTOR" --title "Approve the npm release $VERSION" --body "$BODY" \
+            || echo "::warning::Could not create the reminder issue (are issues enabled on the repository?)"

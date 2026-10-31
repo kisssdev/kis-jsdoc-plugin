@@ -3,7 +3,6 @@ import promise from 'eslint-plugin-promise';
 import unicorn from 'eslint-plugin-unicorn';
 import prettierRecommended from 'eslint-plugin-prettier/recommended';
 import globals from 'globals';
-import babelParser from '@babel/eslint-parser';
 import eslint from '@eslint/js';
 import jsdoc from 'eslint-plugin-jsdoc';
 
@@ -26,15 +25,8 @@ export default [
         ...globals.node,
         ...globals.jasmine
       },
-      parser: babelParser,
-      ecmaVersion: 2019,
-      sourceType: 'module',
-
-      parserOptions: {
-        ecmaFeatures: {
-          legacyDecorators: true
-        }
-      }
+      ecmaVersion: 2022,
+      sourceType: 'commonjs'
     },
 
     rules: {

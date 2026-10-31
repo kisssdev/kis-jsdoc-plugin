@@ -1,0 +1,26 @@
+# Keeps the dependencies up to date with few pull requests: one per week for npm, one per month for GitHub Actions.
+# Security updates (enabled in the repository settings) are not grouped and are opened as soon as an advisory is published.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    # a new release has to be a few days old before being proposed (protects against compromised releases)
+    cooldown:
+      default-days: 7
+    groups:
+      dev-dependencies:
+        dependency-type: development
+        update-types: [minor, patch]
+      dependencies:
+        dependency-type: production
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      github-actions:
+        patterns: ['*']
